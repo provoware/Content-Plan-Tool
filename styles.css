@@ -17,8 +17,8 @@
   --fs-lg: 22px;
   --fs-xl: 28px;
   --radius: 12px;
-  --sidebar-width: 240px;
-  --info-width: 280px;
+  --sidebar-width: clamp(180px, 15vw, 220px);
+  --info-width: clamp(240px, 20vw, 300px);
   --header-height: 52px;
   --status-height: 24px;
   /* Standardfarbwerte (helles Theme). Diese werden bei anderen Themes überschrieben. */
@@ -48,16 +48,18 @@
 
 /* Dunkles Theme */
 html[data-theme="dunkel"] {
-  /* Dunkles Theme nach Vorbild der Layout‑Grafik: tiefblaues Grundlayout und farbige Akzente */
-  --bg: #0a2340;            /* Grundhintergrund: dunkles Nachtblau */
-  --panel: #031926;        /* Panels und Karten: etwas heller */
-  --text: #e6f0ff;         /* Haupttext: helles Blauweiß für hohen Kontrast */
-  --muted: #7d97b3;        /* Sekundärtext: gedämpftes Hellblau */
-  --border: #274472;       /* Linien: Mittelblau für klare Abgrenzung */
-  --nav-bg: #031926;       /* Navigationsleiste: wie Panels */
-  --nav-active-bg: var(--primary); /* Aktiver Eintrag in Akzentfarbe */
-  --nav-text: #8aa6c1;     /* Nav‑Text: mittleres Blau */
-  --nav-active-text: var(--btn-on-primary); /* Aktiver Eintrag: automatische Kontrastfarbe */
+  /* Dunkles Theme nach Vorbild der Layout‑Grafik: dunkles Blau-Grau und farbige Akzente */
+  --bg: #1b1f27;            /* Grundhintergrund: dunkles Blau-Grau */
+  --panel: #232b36;        /* Panels und Karten: etwas heller */
+  --text: #f8fafc;         /* Haupttext: helles Grau für hohen Kontrast */
+  --muted: #bac1d1;        /* Sekundärtext: gedämpftes Hellgrau */
+  --border: #3f4858;       /* Linien: etwas heller für klare Abgrenzung */
+  --nav-bg: #232b36;       /* Navigationsleiste: wie Panels */
+  --nav-active-bg: #1e3a8a; /* Aktiver Eintrag in dunklem Blau */
+  --nav-text: #f0f4ff;     /* Nav‑Text: sehr helles Grau */
+  --nav-active-text: #ffffff; /* Aktiver Eintrag: Weiß */
+  --info-border: #5e3fdb;  /* Lila Rahmen für Info-Panel */
+  --primary: #1467b3;      /* Primärfarbe für Akzente */
   /* Status‑Hintergründe für Tage: frei/belegt */
   --free-bg: #2a0d0d;      /* Freie Tage: dunkles Weinrot */
   --free-bd: #8d2b2b;      /* Rahmen für freie Tage: kräftiges Rot */
@@ -102,6 +104,41 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Skip-Link für Screenreader-Nutzer */
+.skip-link {
+  position: absolute;
+  left: 0;
+  top: -40px;
+  background: var(--primary);
+  color: var(--btn-on-primary);
+  padding: .5rem 1rem;
+  text-decoration: none;
+  z-index: 100;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* Sichtbarer Tastaturfokus */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Bewegungen für Nutzer mit Bewegungseinschränkung minimieren */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition: none !important;
+  }
+}
+
 /* Top‑Bar */
 #top-bar {
   position: fixed;
@@ -112,7 +149,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--panel);
+  background: rgba(35, 43, 54, 0.9);
+  backdrop-filter: blur(4px);
   border-bottom: 2px solid var(--border);
   padding: 0 .75rem;
   z-index: 50;
@@ -210,12 +248,19 @@ body {
   overflow-y: auto;
   background: var(--bg);
   padding: 1rem;
+  display: grid;
+  gap: 1rem;
 }
 #main .module {
   display: none;
 }
 #main .module.active {
   display: block;
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 1rem;
 }
 .section-header {
   margin-bottom: .75rem;
@@ -431,7 +476,7 @@ body {
 /* Info‑Panel (Dashboard) */
 #info-panel {
   background: var(--panel);
-  border-left: 2px solid var(--border);
+  border-left: 4px solid var(--info-border);
   padding: 1rem;
   overflow-y: auto;
 }

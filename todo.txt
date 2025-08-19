@@ -1,0 +1,9 @@
+- [ ] Skip-Link in weiteren Seiten prüfen
+- [x] Weitere Tooltips für Einstellungen ergänzen
+- [x] Kontrastwerte im Dark-Theme testen
+- [ ] Farbschema weiter an Vorlage anpassen
+- [x] Module als Kartenlayout darstellen
+- [ ] Weitere Tests für Kalenderfunktionen ergänzen
+- [ ] Kartenbarrierefreiheit überprüfen
+- [x] JSON-Manifeste für Standards, Erweiterungen und Anleitung hinzufügen
+- [ ] Hilfsfunktionen zentralisieren

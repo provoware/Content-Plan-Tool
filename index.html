@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
   <title>Jahrescontent‑Kalender</title>
   <!--
     Die HTML‑Struktur orientiert sich am in LAYOUT.png gezeigten Drei‑Spalten‑Aufbau: eine feste
@@ -15,9 +16,10 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <a href="#main" class="skip-link">Zum Inhalt springen</a>
   <!-- Oberer Balken mit Markenname und Statusanzeige -->
   <header id="top-bar" role="banner">
-    <button id="menu-toggle" aria-label="Navigation umschalten">☰</button>
+    <button id="menu-toggle" aria-label="Navigation umschalten" title="Seitenleiste ein- oder ausblenden">☰</button>
     <h1 class="title" tabindex="0">Jahrescontent‑Kalender</h1>
     <div id="status" aria-live="polite">Status: Lädt …</div>
   </header>
@@ -25,11 +27,11 @@
     <!-- Linke Navigationsleiste -->
     <nav id="sidebar" aria-label="Hauptnavigation">
       <ul>
-        <li><button type="button" data-target="calendar" class="nav-btn active" aria-current="page"><span class="icon">📅</span><span class="label">Kalender</span></button></li>
-        <li><button type="button" data-target="settings" class="nav-btn"><span class="icon">⚙️</span><span class="label">Einstellungen</span></button></li>
-        <li><button type="button" data-target="help" class="nav-btn"><span class="icon">❓</span><span class="label">Hilfe</span></button></li>
+        <li><button type="button" data-target="calendar" class="nav-btn active" aria-current="page" title="Kalender anzeigen"><span class="icon">📅</span><span class="label">Kalender</span></button></li>
+        <li><button type="button" data-target="settings" class="nav-btn" title="Einstellungen anzeigen"><span class="icon">⚙️</span><span class="label">Einstellungen</span></button></li>
+        <li><button type="button" data-target="help" class="nav-btn" title="Hilfe anzeigen"><span class="icon">❓</span><span class="label">Hilfe</span></button></li>
         <!-- Debug‑Modul in der Navigation -->
-        <li><button type="button" data-target="debug" class="nav-btn"><span class="icon">🐞</span><span class="label">Debug</span></button></li>
+        <li><button type="button" data-target="debug" class="nav-btn" title="Debug-Werkzeuge"><span class="icon">🐞</span><span class="label">Debug</span></button></li>
       </ul>
       <div class="bottom-actions">
         <button id="export-json-btn" type="button" title="Backup (JSON)"><span class="icon">💾</span><span class="label">Backup</span></button>
@@ -56,11 +58,12 @@
         <form id="settings-form" autocomplete="off">
           <div class="form-group">
             <label for="year">Jahr</label>
-            <select id="year"></select>
+            <select id="year" aria-describedby="year-help" title="Kalenderjahr wählen"></select>
+            <small id="year-help" class="muted">Kalenderjahr einstellen</small>
           </div>
           <div class="form-group">
             <label for="theme">Theme</label>
-            <select id="theme">
+            <select id="theme" title="Darstellung (Theme) wählen">
               <option value="hell">Hell</option>
               <option value="dunkel">Dunkel</option>
               <option value="kontrast">Kontrast</option>
@@ -68,7 +71,7 @@
           </div>
           <div class="form-group">
             <label for="palette">Akzentfarbe</label>
-            <select id="palette">
+            <select id="palette" title="Farbe für Hervorhebungen wählen">
               <option value="blue">Blau</option>
               <option value="green">Grün</option>
               <option value="violet">Violett</option>
@@ -136,11 +139,11 @@
     <header>
       <h3 id="drawer-title">Tag bearbeiten</h3>
       <div class="toolbar">
-        <button id="btn-quick-used" class="secondary">Belegt</button>
-        <button id="btn-quick-free" class="secondary">Frei</button>
-        <button id="btn-drawer-save">Speichern</button>
-        <button id="btn-drawer-clear" class="secondary">Leeren</button>
-        <button id="btn-drawer-close" class="secondary">Schließen</button>
+        <button id="btn-quick-used" class="secondary" title="Markiert den Tag als belegt">Belegt</button>
+        <button id="btn-quick-free" class="secondary" title="Markiert den Tag als frei">Frei</button>
+        <button id="btn-drawer-save" title="Änderungen speichern">Speichern</button>
+        <button id="btn-drawer-clear" class="secondary" title="Alle Felder leeren">Leeren</button>
+        <button id="btn-drawer-close" class="secondary" title="Dialog schließen">Schließen</button>
       </div>
     </header>
     <div class="drawer-body">
@@ -149,18 +152,19 @@
         <label for="title">Titel (Haupt)</label>
         <input id="title" type="text" placeholder="Kurzer Titel / Hook" />
       </div>
-      <div class="form-group">
+        <div class="form-group">
         <label for="extraTitles">Zusätzliche Titel</label>
         <div id="extraTitles"></div>
-        <button id="btn-add-title" type="button" class="secondary small">+ Titel</button>
-      </div>
-      <div class="form-group">
+        <button id="btn-add-title" type="button" class="secondary small" aria-label="Weiteres Titelfeld hinzufügen" title="Weiteres Titelfeld hinzufügen">+ Titel</button>
+        </div>
+        <div class="form-group">
         <label for="desc">Beschreibung</label>
         <textarea id="desc" placeholder="Beschreibung, Links, Notizen…"></textarea>
       </div>
       <div class="form-group">
         <label for="tags">Tags</label>
-        <input id="tags" type="text" placeholder="tag1,tag2" />
+        <input id="tags" type="text" placeholder="tag1,tag2" aria-describedby="tags-help" />
+        <small id="tags-help" class="muted">Mehrere Tags mit Komma trennen</small>
       </div>
       <hr />
       <div class="form-group">
@@ -184,6 +188,7 @@
       <div class="modal-content" id="modal-content"></div>
     </div>
   </section>
+  <script src="colors.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

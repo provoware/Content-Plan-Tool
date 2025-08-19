@@ -65,6 +65,8 @@
       localStorage.setItem(key, value);
     } catch (err) {
       memStore[key] = value;
+      updateStatus('Speichern im lokalen Speicher fehlgeschlagen, Fallback genutzt');
+      console.warn('localStorage set failed', err);
     }
   }
   function safeRemove(key) {
@@ -75,6 +77,22 @@
     }
   }
 
+  // Prüfe Unterstützung für Browser-Speicher und weise darauf hin
+  if (!('localStorage' in window)) {
+    const st = document.getElementById('status');
+    if (st) st.textContent = 'Warnung: kein Browser-Speicher verfügbar';
+  }
+  // Globales Fehler-Handling: zeige Meldung im Statusbereich
+  window.addEventListener('error', e => {
+    const st = document.getElementById('status');
+    if (st) st.textContent = 'Fehler: ' + e.message;
+  });
+  // Fange unbehandelte Promise-Ablehnungen ab
+  window.addEventListener('unhandledrejection', e => {
+    const st = document.getElementById('status');
+    if (st) st.textContent = 'Fehler: ' + e.reason;
+  });
+
   /* Zustand laden oder initialisieren */
   let state = loadState() || initState(today.getFullYear());
 
@@ -83,7 +101,7 @@
       year: year,
       items: {},
       log: [],
-      theme: safeGet(THEME_KEY) || 'dunkel',
+      theme: safeGet(THEME_KEY) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dunkel' : 'hell'),
       fontsize: safeGet(FS_KEY) || '16',
       palette: safeGet(PALETTE_KEY) || 'blue'
     };
@@ -94,6 +112,7 @@
       const raw = safeGet(STORAGE_KEY);
       return raw ? JSON.parse(raw) : null;
     } catch (err) {
+      updateStatus('Zustand beschädigt, neu initialisiert');
       return null;
     }
   }
@@ -202,18 +221,6 @@
     rootStyle.setProperty('--btn-on-primary', lum > 0.6 ? '#000000' : '#ffffff');
     state.palette = name;
     safeSet(PALETTE_KEY, name);
-  }
-  function hexToRgb(hex) {
-    const h = hex.replace('#','');
-    const n = parseInt(h,16);
-    return { r:(n>>16)&255, g:(n>>8)&255, b:n&255 };
-  }
-  // Konvertiert eine Hex‑Farbe in einen rgba‑String mit definierter
-  // Transparenz. Wird genutzt, um Monatsüberschriften mit einer
-  // leicht transparenten Version der Akzentfarbe zu hinterlegen.
-  function hexToRgba(hex, alpha) {
-    const { r, g, b } = hexToRgb(hex);
-    return `rgba(${r},${g},${b},${alpha})`;
   }
   function luminance(r,g,b) {
     r/=255; g/=255; b/=255;
@@ -1346,3 +1353,4 @@
     }
   }, 100);
 })();
+

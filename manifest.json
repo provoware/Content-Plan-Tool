@@ -1,0 +1,11 @@
+{
+  "name": "Jahrescontent-Kalender",
+  "version": "1.0.0",
+  "description": "Basiskonfiguration",
+  "manifests": {
+    "standards": "manifest-standards.json",
+    "extensions": "manifest-extensions.json",
+    "guide": "manifest-guide.json",
+    "reuse": "manifest-reuse.json"
+  }
+}
