@@ -91,3 +91,7 @@ Die Anwendung überprüft beim Laden automatisch den Zustand der gespeicherten D
 * **Klar beschriftete Bereiche:** Jede Sektion verfügt über eine Überschrift, und Formulare sind mit Labels versehen. Tooltips erklären Funktionen.
 
 Wir wünschen dir viel Erfolg bei der Planung deiner Inhalte mit dem Jahrescontent‑Kalender!
+
+## 9 – Automatische Startroutine
+
+Mit `npm start` führst du eine Startroutine aus. Diese prüft die Node‑Version, installiert bei Bedarf fehlende Abhängigkeiten (Pakete) und startet anschließende Tests. Alle Schritte werden im Terminal beschrieben. Fehler werden abgefangen und automatisch repariert, soweit möglich.

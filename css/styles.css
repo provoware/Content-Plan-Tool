@@ -42,7 +42,7 @@
   --today-bg: #fef3c7;
   --today-bd: #fde68a;
   --note-bg: #f1f5f9;
-  --focus-ring: 3px solid #f59e0b;
+  --focus-ring: 4px solid #f59e0b;
   --btn-on-primary: #ffffff;
 }
 
@@ -127,7 +127,7 @@ select:focus-visible,
 textarea:focus-visible,
 time:focus-visible {
   outline: var(--focus-ring);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 /* Bewegungen für Nutzer mit Bewegungseinschränkung minimieren */

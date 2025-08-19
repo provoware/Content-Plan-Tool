@@ -4,7 +4,8 @@
   "description": "Dieses Repository enthält die Quelltexte des **Jahrescontent‑Kalenders**, eines webbasierten Werkzeugs zur Jahresplanung von Inhalten. Es ist vollständig clientseitig umgesetzt und speichert alle Daten im Browser‐Speicher (mit Fallback auf ein In‑Memory‑Store). Die Anwendung orientiert sich gestalterisch am modularen Drei‑Spalten‑Layout aus dem mitgelieferten Mockup.",
   "main": "js/app.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "node js/start.js"
   },
   "keywords": [],
   "author": "",
