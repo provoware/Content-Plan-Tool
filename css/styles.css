@@ -109,10 +109,11 @@ body {
   position: absolute;
   left: 0;
   top: -40px;
-  background: var(--primary);
+  background: var(--accent);
   color: var(--btn-on-primary);
   padding: .5rem 1rem;
   text-decoration: none;
+  border-radius: .25rem;
   z-index: 100;
 }
 .skip-link:focus {

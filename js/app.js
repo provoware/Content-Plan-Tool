@@ -474,9 +474,28 @@
   function copyClock() {
     const clock = byId('dash-clock');
     if (!clock) return;
+    const text = clock.textContent || '';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(() => {
+        updateStatus('Datum/Uhrzeit kopiert');
+      }).catch(() => fallbackCopy(text));
+    } else {
+      fallbackCopy(text);
+    }
+  }
+
+  function fallbackCopy(text) {
     try {
-      navigator.clipboard.writeText(clock.textContent || '');
-      updateStatus('Datum/Uhrzeit kopiert');
+      const area = document.createElement('textarea');
+      area.value = text;
+      area.setAttribute('readonly', '');
+      area.style.position = 'fixed';
+      area.style.left = '-9999px';
+      document.body.appendChild(area);
+      area.select();
+      const ok = document.execCommand('copy');
+      document.body.removeChild(area);
+      updateStatus(ok ? 'Datum/Uhrzeit kopiert' : 'Kopieren nicht möglich');
     } catch (err) {
       updateStatus('Kopieren nicht möglich');
     }

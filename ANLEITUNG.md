@@ -13,6 +13,8 @@ Die Oberfläche ist in drei Spalten unterteilt:
 
 Am oberen Rand befindet sich ein fester **Kopfbereich** mit einem Navigations‑Toggle (nur auf kleinen Bildschirmen sichtbar), dem Titel der Anwendung und einer Statusanzeige. Die Statusanzeige informiert dich über den Speichervorgang, Backups oder andere Systemmeldungen.
 
+Beim ersten Drücken der <kbd>Tab</kbd>-Taste erscheint ein versteckter Link „Zum Inhalt springen“, mit dem du direkt in den Hauptbereich springen kannst.
+
 **Hinweis zum Design:** Die Farbauswahl orientiert sich am mitgelieferten Mockup (LAYOUT.png). Das dunkle Standard‑Theme verwendet ein tiefblaues Grundlayout, helle Beschriftungen und farbige Akzentrahmen. Jedes Monatsmodul besitzt einen individuellen Farbrahmen und eine dezent getönte Überschrift – so lässt sich der Kalender auf einen Blick strukturieren. Du kannst jederzeit auf ein helles oder kontrastreiches Farbschema umschalten und die Akzentfarben variieren.
 
 ## 2 – Kalender verwenden
@@ -33,7 +35,7 @@ Am oberen Rand befindet sich ein fester **Kopfbereich** mit einem Navigations‑
 
 Das Dashboard im rechten Panel bietet folgende Informationen und Funktionen:
 
-* **Datum und Uhrzeit:** Oben zeigt eine Live-Uhr aktuelle Werte. Ein Klick kopiert die Anzeige in die Zwischenablage (Clipboard).
+* **Datum und Uhrzeit:** Oben zeigt eine Live-Uhr aktuelle Werte. Ein Klick kopiert die Anzeige in die Zwischenablage (Clipboard). Falls dein Browser das automatische Kopieren nicht unterstützt, wird der Text markiert, damit du ihn mit <kbd>Strg</kbd>+<kbd>C</kbd> kopieren kannst.
 * **Aktueller Monat:** Anzeige des Monatsnamens, Anzahl freier und belegter Tage sowie eine Legende für die Farbkennzeichnung.
 * **Offene Datumsangaben:** Liste aller freien Tage im aktuellen Monat. Mit einem Klick springst du direkt zum ausgewählten Tag im Kalender.
 * **Export:** Buttons zum Export der offenen Tage und des aktuellen Monats als Textdatei.
