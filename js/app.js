@@ -24,6 +24,7 @@
   const THEME_KEY = 'provoware_theme';
   const FS_KEY = 'provoware_fs';
   const PALETTE_KEY = 'provoware_palette';
+  const TIMEFMT_KEY = 'provoware_timefmt';
 
   /* Farben für Monatsrahmen und Überschriften. Diese Liste wird
      zyklisch verwendet, um jedem Monat eine eigene Akzentfarbe
@@ -103,6 +104,8 @@
     canRedo() { return false; },
     getCurrent() { return null; }
   };
+  let timeFormat = safeGet(TIMEFMT_KEY);
+  if (timeFormat !== '12' && timeFormat !== '24') timeFormat = '24';
   let previousState = JSON.stringify(state);
   history.push(previousState);
 
@@ -379,7 +382,10 @@
     container.innerHTML = `
       <div class="dash-section">
         <div class="dash-title">Jetzt</div>
-        <time id="dash-clock" class="pill" datetime="" title="Aktuelles Datum und Uhrzeit – zum Kopieren klicken" aria-live="polite" role="timer" tabindex="0" aria-label="Aktuelle Uhrzeit und Datum">--:--</time>
+        <div class="row">
+          <time id="dash-clock" class="pill" datetime="" title="Aktuelles Datum und Uhrzeit – zum Kopieren klicken" aria-live="polite" role="timer" tabindex="0" aria-label="Aktuelle Uhrzeit und Datum">--:--</time>
+          <button id="time-format-btn" class="pill" type="button" aria-pressed="false" title="Zeitformat 24 Stunden – klicken zum Umstellen">24 h</button>
+        </div>
       </div>
       <div class="dash-section">
         <div class="dash-title">Aktueller Monat</div>
@@ -441,6 +447,12 @@
       clk.onclick = copyClock;
       clk.onkeydown = e => { if (e.key === 'Enter') copyClock(); };
     }
+    const fmtBtn = byId('time-format-btn');
+    if (fmtBtn) {
+      fmtBtn.onclick = toggleTimeFormat;
+      fmtBtn.onkeydown = e => { if (e.key === 'Enter') toggleTimeFormat(); };
+      updateTimeFormatButton();
+    }
     // Notes persistence
     const notesArea = byId('notes');
     if (notesArea) {
@@ -458,8 +470,9 @@
     if (!clock) return;
     try {
       const now = new Date();
-      const fmt = new Intl.DateTimeFormat(navigator.language || 'de-DE', { dateStyle: 'medium', timeStyle: 'medium' });
-      const txt = fmt.format(now);
+      const txt = (typeof formatDateTime === 'function')
+        ? formatDateTime(now, timeFormat === '12')
+        : now.toLocaleString();
       clock.textContent = txt;
       clock.dateTime = now.toISOString();
       clock.setAttribute('aria-label', 'Aktuell ' + txt);
@@ -469,6 +482,23 @@
       clock.textContent = 'Zeit unbekannt';
       clock.setAttribute('aria-label', 'Zeit unbekannt');
     }
+  }
+
+  function updateTimeFormatButton() {
+    const btn = byId('time-format-btn');
+    if (!btn) return;
+    const is12 = timeFormat === '12';
+    btn.setAttribute('aria-pressed', String(is12));
+    btn.textContent = is12 ? '12 h' : '24 h';
+    btn.title = `Zeitformat ${is12 ? '12 Stunden' : '24 Stunden'} – klicken zum Umstellen`;
+  }
+
+  function toggleTimeFormat() {
+    timeFormat = timeFormat === '24' ? '12' : '24';
+    safeSet(TIMEFMT_KEY, timeFormat);
+    updateTimeFormatButton();
+    updateClock();
+    updateStatus('Zeitformat: ' + (timeFormat === '12' ? '12 Stunden' : '24 Stunden'));
   }
 
   function copyClock() {

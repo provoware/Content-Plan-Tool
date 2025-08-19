@@ -17,7 +17,7 @@
 - [x] Undo/Redo Tests ergänzen
 - [x] Uhr barrierefrei und kopierbar machen
 - [x] Kopierfunktion mit Fallback erweitern
-- [ ] Option für andere Zeitformate (z.B. 12/24 h)
+- [x] Option für andere Zeitformate (z.B. 12/24 h)
 - [x] Startroutine für automatische Einrichtung hinzufügen
 - [ ] Tests für Startroutine ergänzen
 - [ ] Tests für Clipboard-Fallback ergänzen

@@ -546,6 +546,13 @@ time:focus-visible {
   min-width: 10ch;
   text-align: center;
 }
+#time-format-btn {
+  min-width: 6ch;
+}
+#time-format-btn[aria-pressed="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+}
 .dash-container .legend {
   display: flex;
   flex-wrap: wrap;
