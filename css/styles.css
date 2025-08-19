@@ -374,6 +374,9 @@ time:focus-visible {
   min-height: var(--tap-size);
   background: var(--accent);
   color: var(--btn-on-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .btn-full[aria-pressed="true"] {
   background: var(--primary);
@@ -381,6 +384,7 @@ time:focus-visible {
 .btn-full:focus-visible {
   outline: var(--focus-ring);
   outline-offset: 3px;
+  box-shadow: 0 0 0 2px var(--btn-on-primary);
 }
 .btn-full:hover:not(:disabled) {
   filter: brightness(1.1);

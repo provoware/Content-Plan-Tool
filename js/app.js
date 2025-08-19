@@ -736,7 +736,7 @@
         updateStatus('Vollbild beendet');
       });
     } else {
-      if (!document.fullscreenEnabled) {
+      if (typeof shouldFullscreenFallback === 'function' && shouldFullscreenFallback(document)) {
         monthEl.classList.add('fullscreen');
         document.body.setAttribute('data-fullscreen', '1');
         btn?.setAttribute('aria-pressed', 'true');
