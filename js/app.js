@@ -136,10 +136,14 @@
     updateDashboard();
     // Debug‑Status aktualisieren
     renderDebugStatus();
+    updateUndoRedoButtons();
   }
 
   function undo() {
-    if (!undoStack.length) return;
+    if (!undoStack.length) {
+      updateStatus('Nichts zum Rückgängigmachen');
+      return;
+    }
     redoStack.push(previousState);
     previousState = undoStack.pop();
     state = JSON.parse(previousState);
@@ -155,10 +159,14 @@
     renderCalendar();
     updateDashboard();
     renderDebugStatus();
+    updateUndoRedoButtons();
   }
 
   function redo() {
-    if (!redoStack.length) return;
+    if (!redoStack.length) {
+      updateStatus('Nichts zum Wiederholen');
+      return;
+    }
     undoStack.push(previousState);
     previousState = redoStack.pop();
     state = JSON.parse(previousState);
@@ -174,6 +182,22 @@
     renderCalendar();
     updateDashboard();
     renderDebugStatus();
+    updateUndoRedoButtons();
+  }
+
+  function updateUndoRedoButtons() {
+    const undoBtn = byId('undo-btn');
+    if (undoBtn) {
+      const dis = !undoStack.length;
+      undoBtn.disabled = dis;
+      undoBtn.setAttribute('aria-disabled', dis ? 'true' : 'false');
+    }
+    const redoBtn = byId('redo-btn');
+    if (redoBtn) {
+      const dis = !redoStack.length;
+      redoBtn.disabled = dis;
+      redoBtn.setAttribute('aria-disabled', dis ? 'true' : 'false');
+    }
   }
   /* Auto‑Backup nach 5 Minuten, falls noch keines vorhanden */
   setTimeout(() => {
@@ -1249,6 +1273,7 @@
   function initDebug() {
     // Render initial status
     renderDebugStatus();
+    updateUndoRedoButtons();
     // Self‑check button
     const runBtn = byId('run-selfcheck');
     if (runBtn) runBtn.addEventListener('click', () => {
@@ -1359,12 +1384,13 @@
     if (tag === 'input' || tag === 'textarea' || e.target.hasAttribute('contenteditable')) {
       return; // keine Shortcuts während Eingabe
     }
-    if (e.ctrlKey && e.key.toLowerCase() === 'z') {
+    const mod = e.ctrlKey || e.metaKey;
+    if (mod && e.key.toLowerCase() === 'z' && !e.shiftKey) {
       e.preventDefault();
       undo();
       return;
     }
-    if (e.ctrlKey && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
+    if (mod && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
       e.preventDefault();
       redo();
       return;

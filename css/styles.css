@@ -731,6 +731,16 @@ button:hover {
   background: var(--nav-active-bg);
   color: var(--nav-active-text);
 }
+button:disabled {
+  background: var(--border);
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: .7;
+}
+button:disabled:hover {
+  background: var(--border);
+  color: var(--muted);
+}
 button.warn {
   background: var(--warn);
   color: #fff;

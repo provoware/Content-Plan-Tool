@@ -104,7 +104,7 @@
             <li>Navigiere mithilfe der Seitenleiste zu den einzelnen Bereichen: <strong>Kalender</strong>, <strong>Einstellungen</strong> und <strong>Hilfe</strong>.</li>
             <li>Im <strong>Kalender</strong> kannst du durch Klick auf einen Tag Details eingeben: Titel, zusätzliche Titel, Beschreibungen, Tags und To‑Dos. Änderungen werden automatisch gespeichert.</li>
             <li>Unter <strong>Einstellungen</strong> kannst du das Jahr, die Darstellung (Theme), die Akzentfarbe und die Textgröße festlegen. Diese Einstellungen werden gespeichert.</li>
-            <li>Nutze Tastenkürzel: <kbd>T</kbd> springt zu heute, <kbd>F</kbd> zum nächsten freien Tag, <kbd>S</kbd> speichert manuell, <kbd>Esc</kbd> schließt Dialoge.</li>
+            <li>Nutze Tastenkürzel: <kbd>T</kbd> springt zu heute, <kbd>F</kbd> zum nächsten freien Tag, <kbd>S</kbd> speichert manuell, <kbd>Esc</kbd> schließt Dialoge, <kbd>Strg</kbd>/<kbd>Cmd</kbd>+<kbd>Z</kbd> macht rückgängig, <kbd>Strg</kbd>/<kbd>Cmd</kbd>+<kbd>Y</kbd> wiederholt.</li>
             <li>Über den Bereich <strong>Backup</strong> in der Seitenleiste kannst du deine Daten als JSON exportieren. Zusätzlich speichert das System automatisch alle fünf Minuten ein Backup ab.</li>
           </ul>
           <p>Weitere Erläuterungen findest du in der beiliegenden Anleitung (ANLEITUNG.md).</p>
@@ -123,8 +123,8 @@
             <button id="export-log" type="button" class="secondary small">Log exportieren</button>
             <button id="clear-storage-btn" type="button" class="warn small">Speicher zurücksetzen</button>
             <button id="autosave-toggle" type="button" class="secondary small">Autosave deaktivieren</button>
-            <button id="undo-btn" type="button" class="secondary small" title="Letzte Aktion rückgängig machen">Undo</button>
-            <button id="redo-btn" type="button" class="secondary small" title="Rückgängig gemachte Aktion wiederholen">Redo</button>
+            <button id="undo-btn" type="button" class="secondary small" title="Letzte Aktion rückgängig machen (Strg/Cmd+Z)" disabled aria-disabled="true">Undo</button>
+            <button id="redo-btn" type="button" class="secondary small" title="Rückgängig gemachte Aktion wiederholen (Strg/Cmd+Y)" disabled aria-disabled="true">Redo</button>
           </div>
           <div id="debug-results" class="list"></div>
         </div>
