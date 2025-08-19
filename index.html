@@ -58,11 +58,12 @@
         <form id="settings-form" autocomplete="off">
           <div class="form-group">
             <label for="year">Jahr</label>
-            <select id="year"></select>
+            <select id="year" aria-describedby="year-help" title="Kalenderjahr wählen"></select>
+            <small id="year-help" class="muted">Kalenderjahr einstellen</small>
           </div>
           <div class="form-group">
             <label for="theme">Theme</label>
-            <select id="theme">
+            <select id="theme" title="Darstellung (Theme) wählen">
               <option value="hell">Hell</option>
               <option value="dunkel">Dunkel</option>
               <option value="kontrast">Kontrast</option>
@@ -70,7 +71,7 @@
           </div>
           <div class="form-group">
             <label for="palette">Akzentfarbe</label>
-            <select id="palette">
+            <select id="palette" title="Farbe für Hervorhebungen wählen">
               <option value="blue">Blau</option>
               <option value="green">Grün</option>
               <option value="violet">Violett</option>
@@ -187,6 +188,7 @@
       <div class="modal-content" id="modal-content"></div>
     </div>
   </section>
+  <script src="colors.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

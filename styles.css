@@ -42,7 +42,7 @@
   --today-bg: #fef3c7;
   --today-bd: #fde68a;
   --note-bg: #f1f5f9;
-  --focus-ring: 3px solid #f59e0b;
+  --focus-ring: 3px solid #14b8a6;
   --btn-on-primary: #ffffff;
 }
 
@@ -51,12 +51,12 @@ html[data-theme="dunkel"] {
   /* Dunkles Theme nach Vorbild der Layout‑Grafik: dunkles Blau-Grau und farbige Akzente */
   --bg: #1b1f27;            /* Grundhintergrund: dunkles Blau-Grau */
   --panel: #232b36;        /* Panels und Karten: etwas heller */
-  --text: #f0f0f0;         /* Haupttext: helles Grau für hohen Kontrast */
-  --muted: #9aa2b5;        /* Sekundärtext: gedämpftes Hellgrau */
-  --border: #2f3847;       /* Linien: Mittelgrau für klare Abgrenzung */
+  --text: #f8fafc;         /* Haupttext: helles Grau für hohen Kontrast */
+  --muted: #bac1d1;        /* Sekundärtext: gedämpftes Hellgrau */
+  --border: #3f4858;       /* Linien: etwas heller für klare Abgrenzung */
   --nav-bg: #232b36;       /* Navigationsleiste: wie Panels */
-  --nav-active-bg: #1467b3; /* Aktiver Eintrag in Blau */
-  --nav-text: #d0d3e1;     /* Nav‑Text: helles Grau */
+  --nav-active-bg: #1e3a8a; /* Aktiver Eintrag in dunklem Blau */
+  --nav-text: #f0f4ff;     /* Nav‑Text: sehr helles Grau */
   --nav-active-text: #ffffff; /* Aktiver Eintrag: Weiß */
   --info-border: #5e3fdb;  /* Lila Rahmen für Info-Panel */
   --primary: #1467b3;      /* Primärfarbe für Akzente */
@@ -246,12 +246,19 @@ textarea:focus-visible {
   overflow-y: auto;
   background: var(--bg);
   padding: 1rem;
+  display: grid;
+  gap: 1rem;
 }
 #main .module {
   display: none;
 }
 #main .module.active {
   display: block;
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 1rem;
 }
 .section-header {
   margin-bottom: .75rem;
