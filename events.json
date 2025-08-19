@@ -1,0 +1,34 @@
+[
+  {
+    "id": "e1",
+    "title": "YouTube: Provoware Trailer",
+    "date": "2025-08-05",
+    "status": "planned",
+    "platform": "youtube",
+    "tags": [
+      "satire",
+      "trailer"
+    ]
+  },
+  {
+    "id": "e2",
+    "title": "Instagram: Cover-Teaser",
+    "date": "2025-08-12",
+    "status": "productive",
+    "platform": "instagram",
+    "tags": [
+      "cover",
+      "teaser"
+    ]
+  },
+  {
+    "id": "e3",
+    "title": "TikTok: Schnitt-Snippet",
+    "date": "2025-08-20",
+    "status": "done",
+    "platform": "tiktok",
+    "tags": [
+      "snippet"
+    ]
+  }
+]

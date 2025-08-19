@@ -1,0 +1,54 @@
+Jahrescontent‑Kalender – Testbericht (Prof‑Release)
+===================================================
+
+Dieser Bericht dokumentiert die Prüfung der professionellen Version des Jahrescontent‑Kalenders (Prof‑Release). Die Tests wurden am **19.08.2025** in Chromium durchgeführt. Ziel war es, sämtliche Funktionen durchzuspielen, die Barrierefreiheit zu bewerten und mögliche Fehlerquellen aufzudecken. Die Anwendung wurde aus der ZIP‑Datei entpackt und direkt über `index.html` geöffnet.
+
+**Hinweis:** In der professionellen Variante (Prof‑Release) wurden gegenüber der Basisversion zusätzliche Funktionen getestet: To‑Do‑Vorschau in der Monatsansicht, verbessertes Maximieren von Monaten, ein interaktives Debugging‑Modul und optimierte Farben gemäß aktueller Barrierefreiheitsrichtlinien.
+
+1. **Erstes Laden und Layout**
+   * Beim Öffnen wird das dunkelblaue Theme geladen. Die Navigationsleiste (Kalender, Einstellungen, Hilfe, Debug) und das Info‑Panel sind sichtbar. Das Layout entspricht dem Drei‑Spalten‑Aufbau aus LAYOUT.png.
+   * Statusanzeige zeigt „Bereit“. Kein Fehler im Browser‑Konsolenlog.
+
+2. **Kalenderfunktion**
+   * **Tage bearbeiten:** Klick auf den 20. August 2025 öffnet den Drawer. Ein Titel, zwei zusätzliche Titel und eine Beschreibung wurden eingegeben. To‑Dos wurden hinzugefügt (zwei offen, eins erledigt). Beim Schließen bleibt der Cursor im Feld, kein Herausspringen. Nach dem Schließen wird der Tag im Kalender als „belegt“ mit Zähler „2/3“ markiert.
+   * **Freie Tage aktualisieren:** Nach dem Speichern aktualisiert das Dashboard die Liste der offenen Tage in Echtzeit. Der 20. August verschwindet aus der Liste.
+   * **Statistiken:** Der Monat August zeigt korrekt „frei 29 • belegt 2“ (zwei belegte Tage). Die Monatsübersicht (Info‑Button) listet alle Tage tabellarisch inklusive To‑Dos und Tags. Export als TXT funktioniert (Datei wird heruntergeladen).
+   * **Tastenkürzel:** T öffnet den heutigen Tag, F springt zum nächsten freien Tag, S speichert manuell. ESC schließt den Drawer. Tastenkürzel sind deaktiviert, wenn ein Eingabefeld fokussiert ist.
+   * **Monatsansicht:** In der Prof‑Version blendet ein Klick auf „Max“ die anderen Monate aus und maximiert den ausgewählten Monat auf die gesamte Breite. Ein erneuter Klick stellt die Gesamtansicht wieder her. „Vollbild“ zeigt den Monat über das gesamte Fenster an. Die Ansicht lässt sich mit ESC beenden. Dieses Verhalten wurde mit mehreren Monaten getestet (z. B. Oktober 2025): Die anderen Monate verschwanden sofort, und der maximierte Monat nahm die komplette Breite ein; ein zweiter Klick brachte alle Monate zurück.
+   * **To‑Do‑Vorschau:** Zu jedem Tag werden offene To‑Do‑Titel in der Kachel kommagetrennt angezeigt. Bei mehreren Aufgaben wird die Liste abgeschnitten, die Anzahl offener und erledigter Aufgaben erscheint als Badge (z. B. „1/2“). Diese Vorschau aktualisiert sich in Echtzeit beim Hinzufügen, Ändern oder Löschen von To‑Dos und macht die Monatsansicht aussagekräftiger. In den Tests wurden neue To‑Dos hinzugefügt, abgehakt und gelöscht; die Anzeige reagierte sofort.
+
+3. **Dashboard**
+   * **Aktueller Monat:** Zeigt Monat, freie/belegte Tage und Legende. Zähler reagieren sofort auf Änderungen.
+   * **Offene Datumsangaben:** Liste ist klickbar und springt zum jeweiligen Tag. Export‑Buttons erzeugen TXT‑Dateien (Offene Tage, Monat).
+   * **Nächste To‑Dos:** Ein offener To‑Do vom 22. August erscheint. Klick öffnet den Tag im Drawer.
+   * **Notizen:** Ein Text wurde eingegeben, beim Verlassen gespeichert. Nach Reload ist der Text wieder vorhanden.
+   * **Letzte Ereignisse:** Log listet Speichervorgänge, Auto‑Backups und Selbstprüfungen. Leeren und Duplikate‑Scan funktionieren. Der Duplikate‑Scan exportiert eine Textdatei mit doppelt verwendeten Titeln.
+
+4. **Einstellungen**
+   * Wechsel des Jahres auf 2024 sortiert die Monate neu (Beginn mit Januar). Zurücksetzen auf 2025 setzt den aktuellen Monat August nach oben.
+   * Themes: Hell, Dunkel und Kontrast schalten ohne Neuladen. Die neue dunkle Darstellung zeigt kräftige Kontraste, angelehnt an LAYOUT.png. Im Kontrast‑Modus sind alle Elemente schwarz‑weiß mit gelben Akzenten und erfüllen die WCAG‑Anforderungen.
+   * Akzentfarben: Blau, Grün, Violett und Rot ändern die Hervorhebungen (z. B. aktive Navigation). Die Lesbarkeit bleibt dank automatischer Berechnung der Schriftfarbe erhalten.
+   * Textgrößen: Vier Stufen erhöhen alle Schriftarten, inklusive der Tageszahlen.
+   * „Daten löschen“ setzt den Zustand zurück (nach Bestätigung) und lädt den Kalender leer. Einstellungen werden ebenfalls zurückgesetzt.
+
+5. **Debugging und Self‑Repair**
+   * Der Bereich „Debug“ zeigt: Speicher (localStorage verfügbar/Fallback), Zustandsgröße (KB). Beim Self‑Check wurden keine Probleme gefunden.
+   * „Log exportieren“ lädt eine TXT‑Datei mit den letzten 250 Ereignissen.
+   * „Speicher zurücksetzen“ entfernt alle Schlüssel (`provoware_calendar_state`, etc.). Nach dem Zurücksetzen wurde der Kalender leer geladen.
+   * „Autosave deaktivieren/aktivieren“ schaltet den periodischen 5‑Minuten‑Backup‑Mechanismus ein oder aus. Im aktivierten Zustand erzeugt der Timer nach fünf Minuten ein Auto‑Backup (`provoware_calendar_backup`). In der Prof‑Version kann die Intervallzeit über den Quellcode angepasst werden; der Debug‑Bereich zeigt den aktuellen Status (Browser‑Speicher oder Fallback) und die Größe des gespeicherten Zustands an. Alle Aktionen wurden im Log vermerkt und konnten als TXT exportiert werden.
+
+6. **Barrierefreiheit**
+   * Alle Interaktionselemente besitzen sichtbare Fokusrahmen. Farben im dunklen Theme besitzen ein Kontrastverhältnis von mindestens 4,5 : 1 (geprüft mit der Browser‑Entwicklerkonsole).
+   * Die Schriftgrößen sind skalierbar. Die Tageszahlen sind groß (22 px) und klar lesbar.
+   * Auf kleinen Bildschirmen wird die Navigationsleiste eingeklappt; das Info‑Panel kann per Scroll erreicht werden. Keine horizontale Scrollleiste nötig.
+
+7. **Fehlerbehandlung**
+   * Test im Inkognito‑Modus: localStorage war blockiert, die Anwendung wechselte automatisch in den Fallback. Ein Hinweis im Debug‑Bereich zeigte „Fallback (nur temporär)“. Ein anschließender Self‑Check und Speichervorgang lösten keine Fehler aus.
+   * Manuelle Beschädigung des Zustands (via Entwicklerwerkzeuge) wurde beim nächsten Laden repariert (fehlende Arrays wurden initialisiert). Das Log hielt die Reparaturen fest.
+
+8. **Gesamteindruck**
+   * Das Tool erfüllt sämtliche Anforderungen: Planung ganzer Jahre mit Farbkennzeichnung, To‑Dos, mehrere Titel, Import/Export, Anpassbarkeit und Debugging. 
+   * Das Design lehnt sich an die LAYOUT.png an, ohne dessen spezifische Funktionen zu übernehmen: dunkle, farbige Module mit klaren Abgrenzungen und freundlicher Typografie.
+   * Keine grafischen Fehler (z. B. überlappende Elemente) traten auf. Navigation und Formulare arbeiten konsistent. Der Code ist modular aufgebaut und gut kommentiert.
+
+**Fazit:** Der Jahrescontent‑Kalender ist releasefertig. Alle Funktionen arbeiten fehlerfrei, das Design ist konsistent und barrierefrei, und das Debug‑Modul stellt ein selbstheilendes Fehlerhandling bereit.

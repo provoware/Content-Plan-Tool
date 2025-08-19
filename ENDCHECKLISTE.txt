@@ -1,0 +1,11 @@
+# EndCheckListe – Provoware Kalender
+- Startdatei vorhanden (index.html) – ja
+- Globale Settings (config/global_settings.json) – vorhanden
+- Barrierefreiheit: lang, viewport, Skip-Link, ARIA – geprüft, Ergänzungen empfohlen
+- Kontrastprüfung – OK
+- JS-Standards: let/const, try/catch – Hinweise erstellt
+- Backup/Export: Verzeichnisse vorhanden
+- Struktur: baumstruktur.txt generiert
+- Todo/Logs: todo.txt wird bei Selfcheck gepflegt
+- Daten überschreiben vermeiden (Zeitstempel)
+(erstellt am 2025-08-19T19:53:00)

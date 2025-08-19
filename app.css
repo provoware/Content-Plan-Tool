@@ -1,0 +1,87 @@
+
+/* assets/app.css – Grundlayout & Komponenten-Design (offline) */
+:root {
+  /* Platzhalter – werden beim Start aus theme.json gesetzt */
+  --bg:#111417; --fg:#e9eef2; --card:#1a1f24; --muted:#9aa4af; --acc:#4fd1c5;
+  --ok:#16a34a; --warn:#d97706; --danger:#ef4444; --border:#2a3440; --shadow:#0003;
+  --radius: 12px; --pad: 12px; --gap: 10px; --font: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, sans-serif;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0; background:var(--bg); color:var(--fg); font-family:var(--font); line-height:1.5}
+a{color:var(--acc)}
+.wrap{max-width:1200px; margin:auto; padding:var(--pad)}
+.skip-link{position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden}
+.skip-link:focus{left:1rem; top:1rem; width:auto; height:auto; padding:.5rem; border:2px solid var(--fg); background:var(--bg)}
+/* Komponenten */
+.card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); box-shadow:0 6px 18px var(--shadow); padding:var(--pad)}
+.btn{appearance:none; border:1px solid var(--border); background:var(--card); color:var(--fg); padding:.6rem 1rem; border-radius:10px; cursor:pointer; transition:transform .06s ease, background .2s}
+.btn:hover{transform:translateY(-1px)}
+.btn:active{transform:translateY(0); opacity:.9}
+.btn.acc{background:var(--acc); color:#000; border-color:transparent}
+.btn.ok{background:var(--ok); color:#000; border-color:transparent}
+.btn.warn{background:var(--warn); color:#000; border-color:transparent}
+.btn.danger{background:var(--danger); color:#fff; border-color:transparent}
+.btn:focus-visible{outline:3px solid var(--acc); outline-offset:2px}
+.input{width:100%; padding:.6rem .8rem; border:1px solid var(--border); border-radius:10px; background:var(--bg); color:var(--fg)}
+.input:focus-visible{outline:3px solid var(--acc); outline-offset:2px}
+.toggle{display:inline-flex; align-items:center; gap:.5rem; cursor:pointer}
+.toggle input{appearance:none; width:40px; height:22px; border-radius:999px; border:1px solid var(--border); position:relative; background:var(--muted)}
+.toggle input:checked{background:var(--acc)}
+.toggle input::after{content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:var(--bg); transition:left .2s}
+.toggle input:checked::after{left:20px}
+.badge{display:inline-block; padding:.2rem .5rem; border-radius:8px; font-size:.85rem; border:1px solid var(--border); background:var(--card)}
+.badge.ok{background:var(--ok); color:#000; border:0}
+.badge.warn{background:var(--warn); color:#000; border:0}
+.badge.danger{background:var(--danger); color:#fff; border:0}
+/* Kalender-Grid */
+.calendar{display:grid; grid-template-columns:repeat(7,1fr); gap:6px}
+.day{position:relative; min-height:100px; padding:.4rem; border:1px solid var(--border); border-radius:8px; background:var(--card)}
+.day .date{font-size:.9rem; color:var(--muted)}
+.todo-pill{position:absolute; left:6px; right:6px; bottom:6px; display:flex; gap:6px; flex-wrap:wrap}
+.todo{padding:.2rem .4rem; border-radius:6px; font-size:.8rem; border:1px solid var(--border); background:var(--bg)}
+.todo.planned{background:var(--warn); color:#000; border:0}
+.todo.productive{background:var(--acc); color:#000; border:0}
+.todo.done{background:var(--ok); color:#000; border:0}
+/* Overlay */
+.overlay[hidden]{display:none}
+.overlay{position:fixed; inset:0; background:#0009; display:grid; place-items:center}
+.dialog{background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:1rem; width:min(640px, 92vw); box-shadow:0 10px 35px var(--shadow)}
+/* Focus visuell */
+:focus-visible{outline:3px solid var(--acc); outline-offset:2px}
+
+
+/* --- Print/PDF (barrierearm, ränderarm) --- */
+@media print {
+  @page { size: A4 portrait; margin: 10mm; }
+  body { background: #fff !important; color: #000 !important; }
+  .wrap { max-width: none; padding: 0; }
+  header, footer, #panel, .badge, #val-log, .overlay, #csv-file, #csv-parse, #csv-merge { display: none !important; }
+  .card { border: 0; box-shadow: none; background: transparent; padding: 0; }
+  .calendar { gap: 2mm; }
+  .day { min-height: 24mm; border: 1px solid #000; border-radius: 0; background: transparent; }
+  .day .date { color: #000 !important; font-weight: bold; }
+  .todo { border: 1px solid #000 !important; color: #000 !important; background: #fff !important; }
+}
+
+
+/* Legend & Summary */
+.legend{display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+.legend .item{display:flex; align-items:center; gap:6px; padding:.2rem .5rem; border:1px solid var(--border); border-radius:8px; background:var(--card)}
+.legend .dot{width:14px; height:14px; border-radius:50%}
+.summary{display:grid; grid-template-columns:repeat(3,1fr); gap:10px}
+.summary .tile{padding:.6rem .8rem; border:1px solid var(--border); border-radius:10px; background:var(--card)}
+
+/* Editor form */
+.form-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.form-grid .full{grid-column:1 / -1}
+label small{color:var(--muted)}
+select.input{background:var(--bg);}
+.kbd{font-family:ui-monospace, SFMono-Regular, Menlo, monospace; padding:.1rem .3rem; border:1px solid var(--border); border-radius:6px}
+
+/* Print additions */
+@media print{
+  .legend{display:flex !important}
+  .summary{display:grid !important; grid-template-columns:repeat(3,1fr); gap:2mm}
+  .summary .tile{border:1px solid #000 !important; background:#fff !important}
+}

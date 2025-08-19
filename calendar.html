@@ -1,0 +1,140 @@
+
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Kalender – Monatsansicht</title>
+  <link rel="stylesheet" href="assets/app.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+  <header role="banner" class="wrap">
+    <h1>Monatsansicht</h1>
+  </header>
+  <main id="main" role="main" class="wrap">
+    <section class="card" id="panel" aria-label="Filter">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:var(--gap)">
+        <div>
+          <strong>Status</strong><br>
+          <label class="toggle"><input type="checkbox" name="f-status" value="planned" checked> <span>geplant</span></label>
+          <label class="toggle"><input type="checkbox" name="f-status" value="productive" checked> <span>produktiv</span></label>
+          <label class="toggle"><input type="checkbox" name="f-status" value="done" checked> <span>fertig</span></label>
+        </div>
+        <div>
+          <strong>Plattform</strong><br>
+          <label class="toggle"><input type="checkbox" name="f-platform" value="youtube"> <span>YouTube</span></label>
+          <label class="toggle"><input type="checkbox" name="f-platform" value="instagram"> <span>Instagram</span></label>
+          <label class="toggle"><input type="checkbox" name="f-platform" value="tiktok"> <span>TikTok</span></label>
+        </div>
+      </div>
+      <div style="margin-top:.75rem">
+        <label for="f-tags"><strong>Tags</strong></label>
+        <input id="f-tags" class="input" placeholder="z. B. satire, techno, release">
+      </div>
+    </section>
+
+    <section style="display:flex; align-items:center; gap:8px; margin:.75rem 0">
+      <button id="prev" class="btn" aria-label="voriger Monat">◀</button>
+      <h2 id="monthLabel" style="margin:0 1rem 0 0" tabindex="0">Monat</h2>
+      <button id="next" class="btn" aria-label="nächster Monat">▶</button>
+      <button id="btn-print" class="btn acc" aria-label="Drucken oder PDF-Export">Drucken/PDF</button>
+      <span class="badge">Validierung</span>
+    </section>
+    <pre id="val-log" class="card" aria-live="polite"></pre>
+
+    <section class="card" aria-label="Monats-Summary">
+      <h3 style="margin-top:0">Übersicht</h3>
+      <div id="summary" class="summary">
+        <div class="tile"><strong>Status</strong><pre id="sum-status"></pre></div>
+        <div class="tile"><strong>Plattform</strong><pre id="sum-platform"></pre></div>
+        <div class="tile"><strong>Tags</strong><pre id="sum-tags"></pre></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="calendar" id="grid" role="grid" aria-label="Kalender"></div>
+    </section>
+  
+    <section class="card" aria-label="CSV Import" style="margin-top:1rem">
+      <h3 style="margin-top:0">CSV-Import <span class="badge">Prüfung</span></h3>
+      <p>Erlaubte Spalten: <code>id,title,date,status,start_date,end_date,deadline,platform,tags,rrule,freq,interval,byweekday</code>.<br>
+      Hinweis: <code>tags</code> durch Semikolon trennen, <code>byweekday</code> mit <code>|</code> (z. B. <code>MO|WE|FR</code>).</p>
+      <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+        <input id="csv-file" type="file" accept=".csv" class="input" aria-label="CSV-Datei auswählen" style="max-width:380px">
+        <button id="csv-parse" class="btn">CSV prüfen</button>
+        <button id="csv-merge" class="btn ok">Merge & Download</button>
+      </div>
+      <pre id="csv-log" aria-live="polite" style="margin-top:.75rem"></pre>
+    </section>
+    
+  </main>
+
+  <div id="overlay" class="overlay" role="dialog" aria-modal="true" hidden>
+    <div class="dialog">
+      <h3 id="ov-title" contenteditable="true" aria-label="Titel bearbeiten">Titel</h3>
+      <form id="ov-form" class="form-grid">
+        <div>
+          <label>Datum<br><input id="ov-date" class="input" type="date"></label>
+        </div>
+        <div>
+          <label>Status<br>
+            <select id="ov-status" class="input">
+              <option value="planned">geplant</option>
+              <option value="productive">produktiv</option>
+              <option value="done">fertig</option>
+            </select>
+          </label>
+        </div>
+        <div>
+          <label>Plattform<br><input id="ov-platform" class="input" placeholder="youtube, instagram, tiktok"></label>
+        </div>
+        <div>
+          <label>Tags <small>(Semikolon)</small><br><input id="ov-tags" class="input" placeholder="satire; techno"></label>
+        </div>
+        <div>
+          <label>Startdatum<br><input id="ov-start" class="input" type="date"></label>
+        </div>
+        <div>
+          <label>Enddatum<br><input id="ov-end" class="input" type="date"></label>
+        </div>
+        <div>
+          <label>Deadline<br><input id="ov-deadline" class="input" type="date"></label>
+        </div>
+        <div>
+          <label>RRULE <small>(optional)</small><br><input id="ov-rrule" class="input" placeholder="FREQ=MONTHLY;INTERVAL=1;BYDAY=MO"></label>
+        </div>
+        <div class="full">
+          <label>Recurrence simpel <small>(statt RRULE)</small><br>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px">
+            <select id="ov-freq" class="input">
+              <option value="">–</option>
+              <option value="DAILY">DAILY</option>
+              <option value="WEEKLY">WEEKLY</option>
+              <option value="MONTHLY">MONTHLY</option>
+              <option value="YEARLY">YEARLY</option>
+            </select>
+            <input id="ov-interval" class="input" type="number" min="1" placeholder="interval">
+            <input id="ov-byday" class="input" placeholder="MO|WE|FR">
+          </div>
+          </label>
+        </div>
+      </form>
+      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:.5rem">
+        <button id="ov-delete" class="btn danger" aria-label="Event löschen">Löschen</button>
+        <button id="ov-save" class="btn ok" aria-label="Event speichern">Speichern</button>
+        <button id="ov-close" class="btn acc" aria-label="Overlay schließen">Schließen (Esc)</button>
+      </div>
+      <small>Tipp: Doppelklick auf einen Tag erstellt ein neues Event. <span class="kbd">Enter</span> bestätigt Buttons.</small>
+    </div>
+  </div>
+
+  <footer role="contentinfo" class="wrap">
+    <small>Tastatur: <kbd>t</kbd> Filter an/aus · <kbd>Esc</kbd> Overlay schließen · <kbd>Enter</kbd> aktiviert Buttons</small>
+  </footer>
+
+  <script type="module" src="assets/calendar.js" defer></script>
+  <script>document.getElementById('ov-close').addEventListener('click', ()=> document.getElementById('overlay').hidden=true);</script>
+</body>
+</html>

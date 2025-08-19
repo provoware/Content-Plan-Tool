@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Jahrescontent‑Kalender</title>
+  <!--
+    Die HTML‑Struktur orientiert sich am in LAYOUT.png gezeigten Drei‑Spalten‑Aufbau: eine feste
+    Navigationsleiste links, eine flexible Arbeitsfläche in der Mitte und ein Info‑Panel rechts.
+    Die semantischen Bereiche werden über klar gekennzeichnete IDs angesprochen und sind von
+    externen Skripten überschaubar manipuliert. Das Design setzt vollständig auf CSS‑Variablen,
+    sodass Themen und Akzentfarben ohne tiefe Eingriffe angepasst werden können. Für Barrierefreiheit
+    sorgen ausreichende Kontraste, große Interaktionsflächen und sinnvolle Aria‑Attribute.
+  -->
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Oberer Balken mit Markenname und Statusanzeige -->
+  <header id="top-bar" role="banner">
+    <button id="menu-toggle" aria-label="Navigation umschalten">☰</button>
+    <h1 class="title" tabindex="0">Jahrescontent‑Kalender</h1>
+    <div id="status" aria-live="polite">Status: Lädt …</div>
+  </header>
+  <div id="layout">
+    <!-- Linke Navigationsleiste -->
+    <nav id="sidebar" aria-label="Hauptnavigation">
+      <ul>
+        <li><button type="button" data-target="calendar" class="nav-btn active" aria-current="page"><span class="icon">📅</span><span class="label">Kalender</span></button></li>
+        <li><button type="button" data-target="settings" class="nav-btn"><span class="icon">⚙️</span><span class="label">Einstellungen</span></button></li>
+        <li><button type="button" data-target="help" class="nav-btn"><span class="icon">❓</span><span class="label">Hilfe</span></button></li>
+        <!-- Debug‑Modul in der Navigation -->
+        <li><button type="button" data-target="debug" class="nav-btn"><span class="icon">🐞</span><span class="label">Debug</span></button></li>
+      </ul>
+      <div class="bottom-actions">
+        <button id="export-json-btn" type="button" title="Backup (JSON)"><span class="icon">💾</span><span class="label">Backup</span></button>
+        <button id="logout-btn" type="button" title="Speicher zurücksetzen"><span class="icon">🚪</span><span class="label">Abmelden</span></button>
+      </div>
+    </nav>
+    <!-- Hauptinhalt: es werden immer nur ein Bereich (section) gleichzeitig angezeigt -->
+    <main id="main" role="main">
+      <!-- Kalenderbereich -->
+      <section id="calendar-section" class="module active" aria-label="Kalender">
+        <div class="section-header">
+          <h2>Kalender</h2>
+        </div>
+        <div class="calendar-wrapper">
+          <!-- Der Kalender selbst wird vom Skript in #calendar erzeugt -->
+          <div id="calendar" aria-live="polite"></div>
+        </div>
+      </section>
+      <!-- Einstellungsbereich -->
+      <section id="settings-section" class="module" aria-label="Einstellungen">
+        <div class="section-header">
+          <h2>Einstellungen</h2>
+        </div>
+        <form id="settings-form" autocomplete="off">
+          <div class="form-group">
+            <label for="year">Jahr</label>
+            <select id="year"></select>
+          </div>
+          <div class="form-group">
+            <label for="theme">Theme</label>
+            <select id="theme">
+              <option value="hell">Hell</option>
+              <option value="dunkel">Dunkel</option>
+              <option value="kontrast">Kontrast</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="palette">Akzentfarbe</label>
+            <select id="palette">
+              <option value="blue">Blau</option>
+              <option value="green">Grün</option>
+              <option value="violet">Violett</option>
+              <option value="red">Rot</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="fontsize">Textgröße</label>
+            <select id="fontsize">
+              <option value="16">100 %</option>
+              <option value="18">112 %</option>
+              <option value="20">125 %</option>
+              <option value="22">137 %</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <button type="button" id="clear-data-btn" class="warn">Daten löschen</button>
+          </div>
+        </form>
+      </section>
+      <!-- Hilfebereich -->
+      <section id="help-section" class="module" aria-label="Hilfe">
+        <div class="section-header">
+          <h2>Hilfe &amp; Anleitung</h2>
+        </div>
+        <div class="help-content">
+          <p>Willkommen beim Jahrescontent‑Kalender! Dieses Werkzeug unterstützt dich beim Planen und Verwalten deines Content‑Jahres. Du kannst Termine anlegen, To‑Dos hinzufügen und die Arbeitstage nach Themen strukturieren.</p>
+          <ul>
+            <li>Navigiere mithilfe der Seitenleiste zu den einzelnen Bereichen: <strong>Kalender</strong>, <strong>Einstellungen</strong> und <strong>Hilfe</strong>.</li>
+            <li>Im <strong>Kalender</strong> kannst du durch Klick auf einen Tag Details eingeben: Titel, zusätzliche Titel, Beschreibungen, Tags und To‑Dos. Änderungen werden automatisch gespeichert.</li>
+            <li>Unter <strong>Einstellungen</strong> kannst du das Jahr, die Darstellung (Theme), die Akzentfarbe und die Textgröße festlegen. Diese Einstellungen werden gespeichert.</li>
+            <li>Nutze Tastenkürzel: <kbd>T</kbd> springt zu heute, <kbd>F</kbd> zum nächsten freien Tag, <kbd>S</kbd> speichert manuell, <kbd>Esc</kbd> schließt Dialoge.</li>
+            <li>Über den Bereich <strong>Backup</strong> in der Seitenleiste kannst du deine Daten als JSON exportieren. Zusätzlich speichert das System automatisch alle fünf Minuten ein Backup ab.</li>
+          </ul>
+          <p>Weitere Erläuterungen findest du in der beiliegenden Anleitung (ANLEITUNG.md).</p>
+        </div>
+      </section>
+      <!-- Debug‑Bereich -->
+      <section id="debug-section" class="module" aria-label="Debug">
+        <div class="section-header">
+          <h2>Debug</h2>
+        </div>
+        <div class="debug-content">
+          <p id="debug-storage">Speicher: —</p>
+          <p id="debug-size">Zustandsgröße: —</p>
+          <div class="debug-actions">
+            <button id="run-selfcheck" type="button" class="secondary small">Self‑Check &amp; Reparieren</button>
+            <button id="export-log" type="button" class="secondary small">Log exportieren</button>
+            <button id="clear-storage-btn" type="button" class="warn small">Speicher zurücksetzen</button>
+            <button id="autosave-toggle" type="button" class="secondary small">Autosave deaktivieren</button>
+          </div>
+          <div id="debug-results" class="list"></div>
+        </div>
+      </section>
+
+    </main>
+    <!-- Rechtes Info‑Panel: Dashboard, Notizen, Statistiken, Schnellhilfe -->
+    <aside id="info-panel" aria-label="Informationen &amp; Dashboard">
+      <!-- Die Elemente des Dashboards werden im Skript innerhalb #dashboard generiert. -->
+      <div id="dashboard" class="dash-container"></div>
+    </aside>
+  </div>
+  <!-- Drawer zur Bearbeitung eines Tages -->
+  <section class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+    <header>
+      <h3 id="drawer-title">Tag bearbeiten</h3>
+      <div class="toolbar">
+        <button id="btn-quick-used" class="secondary">Belegt</button>
+        <button id="btn-quick-free" class="secondary">Frei</button>
+        <button id="btn-drawer-save">Speichern</button>
+        <button id="btn-drawer-clear" class="secondary">Leeren</button>
+        <button id="btn-drawer-close" class="secondary">Schließen</button>
+      </div>
+    </header>
+    <div class="drawer-body">
+      <div class="row"><strong id="drawer-date">Datum</strong><span id="dupemark" class="badge" style="display:none"></span></div>
+      <div class="form-group">
+        <label for="title">Titel (Haupt)</label>
+        <input id="title" type="text" placeholder="Kurzer Titel / Hook" />
+      </div>
+      <div class="form-group">
+        <label for="extraTitles">Zusätzliche Titel</label>
+        <div id="extraTitles"></div>
+        <button id="btn-add-title" type="button" class="secondary small">+ Titel</button>
+      </div>
+      <div class="form-group">
+        <label for="desc">Beschreibung</label>
+        <textarea id="desc" placeholder="Beschreibung, Links, Notizen…"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="tags">Tags</label>
+        <input id="tags" type="text" placeholder="tag1,tag2" />
+      </div>
+      <hr />
+      <div class="form-group">
+        <div class="row"><strong>To‑Dos</strong><button id="btn-add-todo" type="button" class="secondary small">+ To‑Do</button></div>
+        <div id="todoList" class="todo-list"></div>
+      </div>
+      <div class="muted">Zeichen: <span id="charcount">0</span></div>
+    </div>
+  </section>
+  <!-- Modal für Übersichten -->
+  <section class="modal" id="modal" aria-modal="true" role="dialog" aria-labelledby="modal-title">
+    <div class="modal-box">
+      <header>
+        <h3 id="modal-title">Übersicht</h3>
+        <div class="toolbar">
+          <button id="btn-modal-txt" class="secondary">TXT</button>
+          <button id="btn-modal-print" class="secondary">PDF</button>
+          <button id="btn-modal-close" class="secondary">Schließen</button>
+        </div>
+      </header>
+      <div class="modal-content" id="modal-content"></div>
+    </div>
+  </section>
+  <script src="app.js"></script>
+</body>
+</html>

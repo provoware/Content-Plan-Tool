@@ -1,0 +1,31 @@
+{
+  "app_name": "Provoware Jahreskalender",
+  "language": "de",
+  "theme": "auto",
+  "contrast_mode": "AA",
+  "date_locale": "de-DE",
+  "timezone": "Europe/Berlin",
+  "storage": {
+    "save_dir": "data",
+    "backups": true,
+    "backup_dir": "backups",
+    "never_overwrite": true,
+    "filename_format": "yyyyMMdd_HHmmss"
+  },
+  "a11y": {
+    "focus_visible": true,
+    "skip_link": true,
+    "keyboard_traps_check": true,
+    "aria_landmarks": true,
+    "font_scale_default": 1.0
+  },
+  "ui": {
+    "large_buttons": true,
+    "tooltips": true,
+    "high_contrast_palette": true
+  },
+  "modules": {
+    "selfcheck": true,
+    "todo_month_overlay": true
+  }
+}

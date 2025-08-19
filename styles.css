@@ -1,0 +1,753 @@
+/*
+  Diese Datei definiert das visuelle Erscheinungsbild des
+  Jahrescontent‑Kalenders. Sie orientiert sich am modularen Layout
+  aus LAYOUT.png: linke Navigationsleiste, mittlerer Arbeitsbereich
+  für Kalender/Einstellungen/Hilfe und ein rechtes Info‑Panel. Die
+  Farbwerte sind über CSS‑Variablen konfigurierbar; JavaScript kann
+  die Attribute data-theme und Akzentfarben setzen, um das Aussehen
+  dynamisch zu verändern.
+*/
+
+/* Grundwerte und Typografie */
+:root {
+  --fs-base: 16px;
+  --fs-sm: 14px;
+  /* Größere Schriftgrößen für bessere Lesbarkeit, insb. Tageszahlen */
+  /* Größere Schrift für Tagesnummern und Titel */
+  --fs-lg: 22px;
+  --fs-xl: 28px;
+  --radius: 12px;
+  --sidebar-width: 240px;
+  --info-width: 280px;
+  --header-height: 52px;
+  --status-height: 24px;
+  /* Standardfarbwerte (helles Theme). Diese werden bei anderen Themes überschrieben. */
+  --bg: #f5f7fa;
+  --panel: #ffffff;
+  --text: #1e293b;
+  --muted: #64748b;
+  --border: #cbd5e1;
+  --nav-bg: #e2e8f0;
+  --nav-active-bg: #3b82f6;
+  --nav-text: #1e293b;
+  --nav-active-text: #ffffff;
+  --primary: #1d4ed8;
+  --accent: #0ea5e9;
+  --warn: #dc2626;
+  --ok: #16a34a;
+  --free-bg: #fee2e2;
+  --free-bd: #fecaca;
+  --used-bg: #dcfce7;
+  --used-bd: #bbf7d0;
+  --today-bg: #fef3c7;
+  --today-bd: #fde68a;
+  --note-bg: #f1f5f9;
+  --focus-ring: 3px solid #f59e0b;
+  --btn-on-primary: #ffffff;
+}
+
+/* Dunkles Theme */
+html[data-theme="dunkel"] {
+  /* Dunkles Theme nach Vorbild der Layout‑Grafik: tiefblaues Grundlayout und farbige Akzente */
+  --bg: #0a2340;            /* Grundhintergrund: dunkles Nachtblau */
+  --panel: #031926;        /* Panels und Karten: etwas heller */
+  --text: #e6f0ff;         /* Haupttext: helles Blauweiß für hohen Kontrast */
+  --muted: #7d97b3;        /* Sekundärtext: gedämpftes Hellblau */
+  --border: #274472;       /* Linien: Mittelblau für klare Abgrenzung */
+  --nav-bg: #031926;       /* Navigationsleiste: wie Panels */
+  --nav-active-bg: var(--primary); /* Aktiver Eintrag in Akzentfarbe */
+  --nav-text: #8aa6c1;     /* Nav‑Text: mittleres Blau */
+  --nav-active-text: var(--btn-on-primary); /* Aktiver Eintrag: automatische Kontrastfarbe */
+  /* Status‑Hintergründe für Tage: frei/belegt */
+  --free-bg: #2a0d0d;      /* Freie Tage: dunkles Weinrot */
+  --free-bd: #8d2b2b;      /* Rahmen für freie Tage: kräftiges Rot */
+  --used-bg: #0d2a14;      /* Belegte Tage: dunkles Grün */
+  --used-bd: #2f693a;      /* Rahmen belegte Tage: mittleres Grün */
+  --today-bg: #2a2209;     /* Heute: dunkles Braun */
+  --today-bd: #a9731a;     /* Rahmen heute: warmes Braun */
+  --note-bg: #0d2847;      /* Notiz‑Bereich: leicht abgesetztes Blau */
+}
+
+/* Kontrastreiches Theme */
+html[data-theme="kontrast"] {
+  --bg: #000000;
+  --panel: #000000;
+  --text: #ffffff;
+  --muted: #d1d5db;
+  --border: #ffffff;
+  --nav-bg: #000000;
+  --nav-active-bg: #eab308;
+  --nav-text: #ffffff;
+  --nav-active-text: #000000;
+  --free-bg: #3a0008;
+  --free-bd: #ff0033;
+  --used-bg: #002b12;
+  --used-bd: #00ff66;
+  --today-bg: #382b00;
+  --today-bd: #ffde00;
+  --note-bg: #000000;
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  font-size: var(--fs-base);
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Top‑Bar */
+#top-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--panel);
+  border-bottom: 2px solid var(--border);
+  padding: 0 .75rem;
+  z-index: 50;
+}
+#top-bar .title {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.2;
+}
+#top-bar #menu-toggle {
+  background: transparent;
+  border: none;
+  color: var(--nav-text);
+  font-size: var(--fs-xl);
+  cursor: pointer;
+}
+#top-bar #status {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+
+/* Layout: drei Spalten unterhalb des Headers */
+#layout {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr var(--info-width);
+  height: calc(100vh - var(--header-height));
+  margin-top: var(--header-height);
+  overflow: hidden;
+}
+
+/* Sidebar */
+#sidebar {
+  background: var(--nav-bg);
+  border-right: 2px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  padding: .5rem 0;
+}
+#sidebar ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+}
+#sidebar .nav-btn {
+  width: 100%;
+  border: none;
+  background: none;
+  color: var(--nav-text);
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .65rem 1rem;
+  font-size: var(--fs-base);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color .15s ease;
+}
+#sidebar .nav-btn .icon {
+  font-size: var(--fs-lg);
+  /* Icons erhalten Akzentfarbe für bessere Wiedererkennbarkeit */
+  color: var(--accent);
+}
+#sidebar .nav-btn.active,
+#sidebar .nav-btn:hover {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+  outline: none;
+}
+#sidebar .bottom-actions {
+  padding: .5rem;
+  border-top: 2px solid var(--border);
+}
+#sidebar .bottom-actions button {
+  width: 100%;
+  border: none;
+  background: none;
+  color: var(--nav-text);
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .5rem;
+  font-size: var(--fs-base);
+  cursor: pointer;
+  transition: background-color .15s;
+}
+#sidebar .bottom-actions button:hover {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+}
+
+/* Hauptbereich */
+#main {
+  overflow-y: auto;
+  background: var(--bg);
+  padding: 1rem;
+}
+#main .module {
+  display: none;
+}
+#main .module.active {
+  display: block;
+}
+.section-header {
+  margin-bottom: .75rem;
+}
+.section-header h2 {
+  margin: 0;
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Kalender */
+.calendar-wrapper {
+  overflow-x: auto;
+  padding-bottom: 1rem;
+}
+#calendar {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.month {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Wenn ein Monat maximiert wird, nimmt er die gesamte Zeilenbreite ein.
+   Diese Regel sorgt dafür, dass der maximierte Monat im Grid des Kalenders
+   alle verfügbaren Spalten beansprucht. */
+.month.maximized {
+  /* Wenn ein Monat maximiert wird, nimmt er die gesamte Zeilenbreite
+     ein und streckt sich auf 100 % der verfügbaren Breite. */
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+/* Versteckte Monate: wenn ein anderer Monat maximiert wird, werden
+   alle nicht ausgewählten Monate ausgeblendet. */
+.month.hidden {
+  display: none;
+}
+.month.used-all {
+  border-color: var(--used-bd);
+}
+.month.free-all {
+  border-color: var(--free-bd);
+}
+.month-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .5rem .75rem;
+  background: var(--panel);
+  border-bottom: 2px solid var(--border);
+}
+.month-name {
+  font-weight: 700;
+  font-size: var(--fs-base);
+}
+.month-stats {
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+.month-actions {
+  display: flex;
+  gap: .3rem;
+}
+.month-actions button {
+  border: none;
+  background: var(--nav-bg);
+  color: var(--nav-text);
+  padding: .25rem .5rem;
+  border-radius: var(--radius);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+}
+.month-actions button:hover {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+}
+.grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: .3rem;
+  padding: .5rem;
+  flex: 1;
+}
+.weekday {
+  text-align: center;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+  font-weight: 700;
+}
+/*
+ * Gestaltung der Tageskacheln. Für die Profiversion wurden die Kacheln
+ * etwas höher ausgelegt, damit neben Titel und Beschreibung auch die
+ * To‑Do‑Vorschau sichtbar bleibt. Durch das flexible Box‑Layout
+ * füllen sich neue Elemente automatisch auf.
+ */
+.day {
+  background: var(--panel);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+  padding: .35rem;
+  /* Erhöhte Mindesthöhe für mehr Zeilen in der Kachel */
+  min-height: 88px;
+  cursor: pointer;
+}
+.day.free {
+  background: var(--free-bg);
+  border-color: var(--free-bd);
+}
+.day.used {
+  background: var(--used-bg);
+  border-color: var(--used-bd);
+}
+.day.today {
+  box-shadow: inset 0 0 0 3px var(--today-bd);
+}
+.day-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.day-num {
+  font-weight: 700;
+  font-size: var(--fs-lg);
+}
+.state {
+  display: flex;
+  gap: .25rem;
+  align-items: center;
+}
+.badge {
+  padding: .1rem .4rem;
+  border-radius: 999px;
+  font-size: var(--fs-sm);
+  border: 2px solid var(--border);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.badge.free {
+  background: var(--free-bg);
+  border-color: var(--free-bd);
+  color: #7f1d1d;
+}
+.badge.used {
+  background: var(--used-bg);
+  border-color: var(--used-bd);
+  color: #065f46;
+}
+.badge.today {
+  background: var(--today-bg);
+  border-color: var(--today-bd);
+  color: #92400e;
+}
+.badge.todos {
+  /* To‑Do‑Badges deutlich hervorheben: Akzentfarbe für Hintergrund,
+     helle Schrift und passender Rahmen. */
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--btn-on-primary);
+}
+.quick input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-weight: 600;
+  font-size: var(--fs-sm);
+  color: inherit;
+  outline: none;
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .15rem;
+}
+.chip {
+  padding: .05rem .35rem;
+  border-radius: 999px;
+  font-size: var(--fs-sm);
+  background: var(--panel);
+  border: 2px solid var(--border);
+  color: var(--muted);
+}
+
+/* Vorschau der To‑Dos innerhalb einer Tageskachel. Diese Zeile zeigt die
+   ersten To‑Do‑Titel kommagetrennt und wird optisch zurückgenommen,
+   damit sie nicht mit den Haupttiteln konkurriert. */
+/*
+ * Vorschau der To‑Dos innerhalb einer Tageskachel. In der Profiversion
+ * nutzen wir die Akzentfarbe, um offene Aufgaben stärker hervorzuheben.
+ * Die Schrift ist leicht fett und kontrastreich, damit sie auch bei
+ * dunklen Hintergründen gut lesbar ist.
+ */
+.todo-preview {
+  font-size: var(--fs-sm);
+  color: var(--accent);
+  font-weight: 600;
+  margin-top: .2rem;
+  line-height: 1.2;
+}
+
+/* Info‑Panel (Dashboard) */
+#info-panel {
+  background: var(--panel);
+  border-left: 2px solid var(--border);
+  padding: 1rem;
+  overflow-y: auto;
+}
+.dash-container .dash-section {
+  margin-bottom: 1rem;
+}
+.dash-container .dash-title {
+  font-size: var(--fs-lg);
+  font-weight: 700;
+  margin-bottom: .5rem;
+}
+.dash-container .muted {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  margin-bottom: .25rem;
+}
+.dash-container .list {
+  display: grid;
+  gap: .35rem;
+  max-height: 200px;
+  overflow-y: auto;
+  padding-right: .25rem;
+}
+.dash-container .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .3rem .6rem;
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text);
+  font-size: var(--fs-sm);
+  cursor: pointer;
+  text-align: left;
+}
+.dash-container .pill:hover {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+}
+.dash-container .legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+  margin-bottom: .5rem;
+}
+.dash-container .legend .pill {
+  cursor: default;
+}
+#notes {
+  width: 100%;
+  min-height: 120px;
+  background: var(--note-bg);
+  color: var(--text);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: .5rem;
+  resize: vertical;
+}
+#event-log {
+  font-size: var(--fs-sm);
+  max-height: 150px;
+  overflow-y: auto;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: .25rem;
+}
+
+/* Drawer Styles */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: min(480px, 100%);
+  background: var(--panel);
+  border-left: 3px solid var(--border);
+  box-shadow: -4px 0 12px rgba(0,0,0,.2);
+  transform: translateX(100%);
+  transition: transform .3s ease;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+.drawer.open {
+  transform: translateX(0);
+}
+.drawer header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .75rem 1rem;
+  border-bottom: 2px solid var(--border);
+}
+.drawer .toolbar button {
+  margin-left: .25rem;
+}
+.drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
+}
+.drawer .form-group {
+  margin-bottom: .75rem;
+}
+.drawer input[type="text"],
+.drawer textarea {
+  width: 100%;
+  background: var(--panel);
+  color: var(--text);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: .5rem;
+  font-size: var(--fs-base);
+}
+.drawer textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+.drawer .small {
+  font-size: var(--fs-sm);
+  padding: .25rem .5rem;
+}
+.drawer .todo-list {
+  display: grid;
+  gap: .5rem;
+  max-height: 180px;
+  overflow-y: auto;
+  margin-top: .25rem;
+}
+.drawer .todo-row {
+  display: flex;
+  gap: .5rem;
+  align-items: center;
+}
+.drawer .todo-row input[type="text"] {
+  flex: 1;
+}
+.drawer .badge {
+  font-size: var(--fs-sm);
+}
+
+/* Modal */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 120;
+}
+.modal.open {
+  display: flex;
+}
+.modal-box {
+  background: var(--panel);
+  color: var(--text);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  width: min(1100px, 96%);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+.modal-box header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: .75rem 1rem;
+  border-bottom: 2px solid var(--border);
+}
+.modal-content {
+  padding: 1rem;
+  overflow-y: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--fs-sm);
+}
+th, td {
+  border-bottom: 1px solid var(--border);
+  padding: .5rem .6rem;
+  text-align: left;
+}
+tr:hover {
+  background: rgba(0,0,0,.05);
+}
+
+/* Debug‑Bereich */
+.debug-content p {
+  margin: .3rem 0;
+  font-size: var(--fs-sm);
+  color: var(--muted);
+}
+.debug-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  margin-bottom: .5rem;
+}
+#debug-results {
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: .5rem;
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: var(--fs-sm);
+  color: var(--text);
+  background: var(--panel);
+}
+
+/* Buttons */
+button {
+  border: 2px solid var(--border);
+  background: var(--panel);
+  color: var(--text);
+  font-size: var(--fs-base);
+  padding: .45rem .75rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background-color .15s ease, color .15s ease;
+}
+button:hover {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+}
+button.warn {
+  background: var(--warn);
+  color: #fff;
+  border-color: var(--warn);
+}
+button.warn:hover {
+  background: #b91c1c;
+  border-color: #b91c1c;
+}
+button.secondary {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text);
+}
+button.secondary:hover {
+  background: var(--nav-active-bg);
+  color: var(--nav-active-text);
+}
+
+/* Inputs */
+select, input[type="text"], textarea {
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: .4rem .6rem;
+  background: var(--panel);
+  color: var(--text);
+  font-size: var(--fs-base);
+  width: 100%;
+}
+
+select:focus, input:focus, textarea:focus, button:focus {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Responsive Anpassungen */
+@media (max-width: 1000px) {
+  #layout {
+    grid-template-columns: var(--sidebar-width) 1fr;
+  }
+  #info-panel {
+    display: none;
+  }
+}
+@media (max-width: 640px) {
+  #sidebar {
+    position: fixed;
+    top: var(--header-height);
+    left: -100%;
+    bottom: 0;
+    width: var(--sidebar-width);
+    z-index: 200;
+    transition: transform .3s ease;
+  }
+  #sidebar.open {
+    transform: translateX(100%);
+  }
+  #layout {
+    grid-template-columns: 1fr;
+  }
+  #top-bar #menu-toggle {
+    display: inline;
+  }
+}
+@media print {
+  #top-bar, #sidebar, #info-panel, .drawer, .modal {
+    display: none !important;
+  }
+  #layout {
+    grid-template-columns: 1fr;
+    margin: 0;
+  }
+  #calendar {
+    page-break-inside: avoid;
+  }
+}
+
+/* Debug Bereich */
+#debug-section .debug-content {
+  display: grid;
+  gap: .75rem;
+}
+#debug-results {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: .4rem;
+  font-size: var(--fs-sm);
+  background: var(--note-bg);
+}

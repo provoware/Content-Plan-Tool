@@ -1,0 +1,55 @@
+{
+  "source": null,
+  "palette": [
+    "#111417",
+    "#e9eef2",
+    "#1a1f24",
+    "#9aa4af",
+    "#4fd1c5",
+    "#22c55e",
+    "#d97706",
+    "#ef4444",
+    "#0ea5e9",
+    "#9333ea",
+    "#111827",
+    "#f3f4f6"
+  ],
+  "variants": {
+    "dark": {
+      "bg": "#111417",
+      "fg": "#f3f4f6",
+      "card": "#111827",
+      "muted": "#ef4444",
+      "acc": "#d97706",
+      "ok": "#22c55e",
+      "warn": "#d97706",
+      "danger": "#ef4444",
+      "border": "#1a1f24",
+      "shadow": "#00000080"
+    },
+    "light": {
+      "bg": "#f3f4f6",
+      "fg": "#111417",
+      "card": "#e9eef2",
+      "muted": "#22c55e",
+      "acc": "#d97706",
+      "ok": "#22c55e",
+      "warn": "#d97706",
+      "danger": "#ef4444",
+      "border": "#4fd1c5",
+      "shadow": "#0000001a"
+    },
+    "high_contrast": {
+      "bg": "#111417",
+      "fg": "#ffffff",
+      "card": "#111827",
+      "muted": "#ef4444",
+      "acc": "#22d3ee",
+      "ok": "#22c55e",
+      "warn": "#d97706",
+      "danger": "#ef4444",
+      "border": "#ffffff",
+      "shadow": "#00000080"
+    }
+  }
+}

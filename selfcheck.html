@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Selfcheck – Provoware Kalender</title>
+  <style>
+    body{font-family:system-ui, sans-serif; line-height:1.5; padding:1rem; max-width:1100px; margin:auto;}
+    .skip-link{position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden;}
+    .skip-link:focus{left:1rem; top:1rem; width:auto; height:auto; padding:.5rem; border:2px solid; background:#fff;}
+    pre{background:#00000010; padding:1rem; border-radius:.5rem; overflow:auto;}
+    a, button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Zum Inhalt springen</a>
+  <header role="banner"><h1>Selfcheck</h1></header>
+  <main id="main" role="main">
+    <p>Automatischer Schnelltest für Struktur, A11y und Standards.</p>
+    <h2>Protokoll</h2>
+    <pre id="selfcheck-log" aria-live="polite"></pre>
+    <h2>Todo</h2>
+    <pre id="selfcheck-todo"></pre>
+  
+    <section class="card">
+      <h2>Kontrast-Feinjustage</h2>
+      <p>Wenn AA unterschritten wird: <button class="btn acc" onclick="downloadThemeSuggestion()">Vorschlagsdatei laden</button> und als <code>config/theme.json</code> ersetzen.</p>
+    </section>
+  </main>
+  <footer role="contentinfo"><small>&copy; Provoware</small></footer>
+  <script src="selfcheck.js"></script>
+</body>
+</html>
