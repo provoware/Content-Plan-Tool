@@ -330,6 +330,7 @@
           buildSelectors();
           renderCalendar();
           renderDashboardStructure();
+          updateClock();
           updateDashboard();
           renderLog();
           updateStatus('Zurückgesetzt');
@@ -347,6 +348,10 @@
     if (!container) return;
     container.innerHTML = '';
     container.innerHTML = `
+      <div class="dash-section">
+        <div class="dash-title">Jetzt</div>
+        <time id="dash-clock" class="pill" datetime="" title="Aktuelles Datum und Uhrzeit" aria-live="polite"></time>
+      </div>
       <div class="dash-section">
         <div class="dash-title">Aktueller Monat</div>
         <div class="row">
@@ -411,6 +416,18 @@
         logEvent('Notizen gespeichert');
         renderLog();
       });
+    }
+  }
+
+  function updateClock() {
+    const clock = byId('dash-clock');
+    if (!clock) return;
+    try {
+      const now = new Date();
+      clock.textContent = now.toLocaleString(navigator.language || 'de-DE');
+      clock.dateTime = now.toISOString();
+    } catch (err) {
+      clock.textContent = 'Zeit unbekannt';
     }
   }
 
@@ -1222,6 +1239,7 @@
         persistState();
         buildSelectors();
         renderDashboardStructure();
+        updateClock();
         renderCalendar();
         updateDashboard();
         renderLog();
@@ -1400,6 +1418,8 @@
   renderDashboardStructure();
   renderCalendar();
   updateDashboard();
+  updateClock();
+  setInterval(updateClock, 1000);
   renderLog();
   updateStatus('Bereit');
   // Debug initialisieren (enthält Autosave‑Start)

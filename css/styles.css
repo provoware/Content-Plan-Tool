@@ -517,6 +517,12 @@ textarea:focus-visible {
   background: var(--nav-active-bg);
   color: var(--nav-active-text);
 }
+#dash-clock {
+  font-size: var(--fs-lg);
+  font-weight: bold;
+  color: var(--accent);
+  border-color: var(--accent);
+}
 .dash-container .legend {
   display: flex;
   flex-wrap: wrap;

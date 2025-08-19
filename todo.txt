@@ -11,3 +11,4 @@
 - [x] Print-CSS einbinden
 - [x] Fokus-Stile und Zielgrößen verbessern
 - [x] Undo/Redo-Grundlage anlegen
+- [x] Datum und Uhrzeit im Dashboard anzeigen
