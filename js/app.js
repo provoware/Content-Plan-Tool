@@ -559,7 +559,7 @@
         <div class="month-stats" id="stats-${m}">—</div>
         <div class="month-actions">
           <button type="button" class="btn-max" title="Monat maximieren">Max</button>
-          <button type="button" class="btn-full" title="Monat als Vollbild öffnen (Esc schließt)" aria-label="Vollbild umschalten" aria-pressed="false">Vollbild</button>
+          <button type="button" class="btn-full" title="Monat als Vollbild öffnen (Esc schließt, Strg+Shift+F)" aria-label="Vollbild umschalten" aria-pressed="false">Vollbild</button>
           <button type="button" class="btn-overview" title="Monatsübersicht öffnen">Info</button>
         </div>
       `;
@@ -1481,6 +1481,17 @@
     if (mod && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
       e.preventDefault();
       redo();
+      return;
+    }
+    if (mod && e.shiftKey && e.key.toLowerCase() === 'f') {
+      e.preventDefault();
+      const monthEl = currentFullscreen || (e.target.closest && e.target.closest('.month')) || document.querySelector('.month');
+      if (monthEl) {
+        const btn = monthEl.querySelector('.btn-full');
+        toggleFullscreen(monthEl, btn);
+      } else {
+        updateStatus('Kein Monat für Vollbild gefunden');
+      }
       return;
     }
     if (e.key === 'Escape') {

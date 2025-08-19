@@ -28,7 +28,7 @@ Beim ersten Drücken der <kbd>Tab</kbd>-Taste erscheint ein versteckter Link „
    - **To‑Dos:** Aufgabenliste für diesen Tag. Neue Einträge fügst du mit „+ To‑Do“ hinzu, erledigte To‑Dos haken ab. Der Zähler (offen/erledigt) erscheint in der Tageskachel, und die Titel deiner To‑Dos werden direkt als Vorschau in der Tageskachel angezeigt, damit du geplante Aufgaben auf einen Blick erkennst.
 3. **Speichern:** Änderungen werden automatisch beim Verlassen des Eingabefeldes oder Schließen des Drawers gespeichert. Du kannst zusätzlich mit <kbd>S</kbd> eine manuelle Speicherung auslösen.
 4. **Markierungen:** Freie Tage sind rot hinterlegt, belegte Tage grün. Heute wird mit einem gelben Rahmen markiert. Der Zähler in der Ecke zeigt offene/erledigte To‑Dos.
-5. **Monate maximieren:** Über „Max“ vergrößerst du einen Monat. In der Profiversion wird der ausgewählte Monat allein angezeigt und belegt die gesamte Breite der Kalenderansicht; alle anderen Monate werden ausgeblendet, sodass du dich auf diesen Abschnitt konzentrieren kannst. Ein weiterer Klick auf „Max“ stellt die normale Ansicht wieder her. „Vollbild“ schaltet den Monat in einen eigenen Vollbildmodus; mit erneutem Klick oder der Taste <kbd>Esc</kbd> verlässt du ihn. Beim Wechsel zeigt die Statuszeile kurz an, ob das Vollbild aktiv oder beendet ist.
+5. **Monate maximieren:** Über „Max“ vergrößerst du einen Monat. In der Profiversion wird der ausgewählte Monat allein angezeigt und belegt die gesamte Breite der Kalenderansicht; alle anderen Monate werden ausgeblendet, sodass du dich auf diesen Abschnitt konzentrieren kannst. Ein weiterer Klick auf „Max“ stellt die normale Ansicht wieder her. „Vollbild“ schaltet den Monat in einen eigenen Vollbildmodus; mit erneutem Klick, der Taste <kbd>Esc</kbd> oder dem Tastenkürzel <kbd>Strg</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> verlässt du ihn. Beim Wechsel zeigt die Statuszeile kurz an, ob das Vollbild aktiv oder beendet ist.
 6. **Übersichten:** „Info“ öffnet eine tabellarische Monatsübersicht. Im Kopfbereich des Kalenders findest du Buttons für Jahres‑ und Monatsübersichten, PDF‑Druck und Text‑Export.
 
 ## 3 – Dashboard nutzen
@@ -65,6 +65,7 @@ Die Einstellungen werden sofort angewandt und gespeichert. Sollte dein Browser k
 | <kbd>T</kbd> | Springt zum heutigen Datum und öffnet den Editor.        |
 | <kbd>F</kbd> | Springt zum nächsten freien Tag und öffnet den Editor.    |
 | <kbd>S</kbd> | Speichert den aktuellen Zustand manuell.                 |
+| <kbd>Strg</kbd>/<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> | Vollbild für den aktuellen Monat umschalten. |
 | <kbd>Strg</kbd>/<kbd>Cmd</kbd>+<kbd>Z</kbd> | Letzte Aktion rückgängig (Undo ↶). |
 | <kbd>Strg</kbd>/<kbd>Cmd</kbd>+<kbd>Y</kbd> | Rückgängig gemachte Aktion wiederholen (Redo ↷). |
 | <kbd>Esc</kbd> | Schließt geöffnete Dialoge (Drawer oder Übersicht).      |

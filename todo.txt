@@ -21,6 +21,7 @@
 - [x] Startroutine für automatische Einrichtung hinzufügen
 - [ ] Tests für Startroutine ergänzen
 - [ ] Tests für Clipboard-Fallback ergänzen
+- [ ] Tests für Vollbild-Shortcut ergänzen
 - [x] Themes prüfen und ungültige Angaben auf „Hell“ setzen
 - [x] Fokusdarstellung und Zielgröße der Pillen verbessern
 - [x] Tests für Theme-Fallback ergänzen

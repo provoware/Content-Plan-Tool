@@ -378,6 +378,13 @@ time:focus-visible {
 .btn-full[aria-pressed="true"] {
   background: var(--primary);
 }
+.btn-full:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 3px;
+}
+.btn-full:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
 .grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
