@@ -26,3 +26,4 @@
 - [x] Themes prüfen und ungültige Angaben auf „Hell“ setzen
 - [x] Fokusdarstellung und Zielgröße der Pillen verbessern
 - [x] Tests für Theme-Fallback ergänzen
+- [ ] Tap-Größen im Debug-Bereich prüfen

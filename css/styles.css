@@ -21,7 +21,7 @@
   --info-width: clamp(240px, 20vw, 300px);
   --header-height: 52px;
   --status-height: 24px;
-  --tap-size: 2.5rem;
+  --tap-size: 2.75rem;
   /* Standardfarbwerte (helles Theme). Diese werden bei anderen Themes überschrieben. */
   --bg: #f5f7fa;
   --panel: #ffffff;
@@ -209,6 +209,7 @@ time:focus-visible {
   align-items: center;
   gap: .75rem;
   padding: .65rem 1rem;
+  min-height: var(--tap-size);
   font-size: var(--fs-base);
   cursor: pointer;
   text-align: left;
@@ -223,7 +224,6 @@ time:focus-visible {
 #sidebar .nav-btn:hover {
   background: var(--nav-active-bg);
   color: var(--nav-active-text);
-  outline: none;
 }
 #sidebar .bottom-actions {
   padding: .5rem;
@@ -238,6 +238,7 @@ time:focus-visible {
   align-items: center;
   gap: .5rem;
   padding: .5rem;
+  min-height: var(--tap-size);
   font-size: var(--fs-base);
   cursor: pointer;
   transition: background-color .15s;

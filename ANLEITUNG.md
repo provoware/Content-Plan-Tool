@@ -89,6 +89,7 @@ Die Anwendung überprüft beim Laden automatisch den Zustand der gespeicherten D
 ## 8 – Barrierefreiheit und Benutzerfreundlichkeit
 
 * **Kontraste:** Alle Themes erfüllen die WCAG‑Kontrastkriterien. Buttons und interaktive Elemente besitzen gut sichtbare Fokusrahmen.
+* **Große Klickflächen:** Navigation und Buttons bieten mindestens 44 px hohe Tippflächen (Tap‑Targets), damit sie auch auf Touch‑Geräten leicht zu treffen sind.
 * **Schriftgrößen:** Wähle unter Einstellungen die für dich passende Textgröße. Große Tageszahlen erleichtern das Lesen.
 * **Responsive Design:** Auf kleineren Bildschirmen fährt die Navigationsleiste ein; das Info‑Panel wird ausgeblendet, um Platz zu sparen.
 * **Klar beschriftete Bereiche:** Jede Sektion verfügt über eine Überschrift, und Formulare sind mit Labels versehen. Tooltips erklären Funktionen.
