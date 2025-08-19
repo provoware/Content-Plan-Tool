@@ -20,7 +20,7 @@
 - [x] Option für andere Zeitformate (z.B. 12/24 h)
 - [x] Startroutine für automatische Einrichtung hinzufügen
 - [ ] Tests für Startroutine ergänzen
-- [ ] Tests für Clipboard-Fallback ergänzen
+- [x] Tests für Clipboard-Fallback ergänzen
 - [ ] Tests für Vollbild-Shortcut ergänzen
 - [x] Tests für Vollbild-Fallback ergänzen
 - [x] Themes prüfen und ungültige Angaben auf „Hell“ setzen

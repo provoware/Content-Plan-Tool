@@ -35,7 +35,7 @@ Beim ersten Drücken der <kbd>Tab</kbd>-Taste erscheint ein versteckter Link „
 
 Das Dashboard im rechten Panel bietet folgende Informationen und Funktionen:
 
-* **Datum und Uhrzeit:** Oben zeigt eine Live-Uhr aktuelle Werte. Ein Klick kopiert die Anzeige in die Zwischenablage (Clipboard). Falls dein Browser das automatische Kopieren nicht unterstützt, wird der Text markiert, damit du ihn mit <kbd>Strg</kbd>+<kbd>C</kbd> kopieren kannst. Über den danebenstehenden Knopf „24 h/12 h" lässt sich das Zeitformat umstellen.
+* **Datum und Uhrzeit:** Oben zeigt eine Live-Uhr aktuelle Werte. Ein Klick oder <kbd>Enter</kbd> nach Fokus (Tab) kopiert die Anzeige in die Zwischenablage (Clipboard). Falls dein Browser das automatische Kopieren nicht unterstützt, wird der Text markiert, damit du ihn mit <kbd>Strg</kbd>+<kbd>C</kbd> kopieren kannst. Über den danebenstehenden Knopf „24 h/12 h" lässt sich das Zeitformat umstellen.
 * **Aktueller Monat:** Anzeige des Monatsnamens, Anzahl freier und belegter Tage sowie eine Legende für die Farbkennzeichnung.
 * **Offene Datumsangaben:** Liste aller freien Tage im aktuellen Monat. Mit einem Klick springst du direkt zum ausgewählten Tag im Kalender.
 * **Export:** Buttons zum Export der offenen Tage und des aktuellen Monats als Textdatei.

@@ -571,6 +571,14 @@ time:focus-visible {
   border-color: var(--accent);
   min-width: 10ch;
   text-align: center;
+  cursor: pointer;
+}
+#dash-clock:hover {
+  text-decoration: underline;
+}
+#dash-clock:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 #time-format-btn {
   min-width: 6ch;
