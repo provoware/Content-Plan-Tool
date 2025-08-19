@@ -19,7 +19,7 @@
   <a href="#main" class="skip-link">Zum Inhalt springen</a>
   <!-- Oberer Balken mit Markenname und Statusanzeige -->
   <header id="top-bar" role="banner">
-    <button id="menu-toggle" aria-label="Navigation umschalten">☰</button>
+    <button id="menu-toggle" aria-label="Navigation umschalten" title="Seitenleiste ein- oder ausblenden">☰</button>
     <h1 class="title" tabindex="0">Jahrescontent‑Kalender</h1>
     <div id="status" aria-live="polite">Status: Lädt …</div>
   </header>
@@ -27,11 +27,11 @@
     <!-- Linke Navigationsleiste -->
     <nav id="sidebar" aria-label="Hauptnavigation">
       <ul>
-        <li><button type="button" data-target="calendar" class="nav-btn active" aria-current="page"><span class="icon">📅</span><span class="label">Kalender</span></button></li>
-        <li><button type="button" data-target="settings" class="nav-btn"><span class="icon">⚙️</span><span class="label">Einstellungen</span></button></li>
-        <li><button type="button" data-target="help" class="nav-btn"><span class="icon">❓</span><span class="label">Hilfe</span></button></li>
+        <li><button type="button" data-target="calendar" class="nav-btn active" aria-current="page" title="Kalender anzeigen"><span class="icon">📅</span><span class="label">Kalender</span></button></li>
+        <li><button type="button" data-target="settings" class="nav-btn" title="Einstellungen anzeigen"><span class="icon">⚙️</span><span class="label">Einstellungen</span></button></li>
+        <li><button type="button" data-target="help" class="nav-btn" title="Hilfe anzeigen"><span class="icon">❓</span><span class="label">Hilfe</span></button></li>
         <!-- Debug‑Modul in der Navigation -->
-        <li><button type="button" data-target="debug" class="nav-btn"><span class="icon">🐞</span><span class="label">Debug</span></button></li>
+        <li><button type="button" data-target="debug" class="nav-btn" title="Debug-Werkzeuge"><span class="icon">🐞</span><span class="label">Debug</span></button></li>
       </ul>
       <div class="bottom-actions">
         <button id="export-json-btn" type="button" title="Backup (JSON)"><span class="icon">💾</span><span class="label">Backup</span></button>

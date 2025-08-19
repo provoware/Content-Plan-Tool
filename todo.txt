@@ -1,3 +1,5 @@
 - [ ] Skip-Link in weiteren Seiten prüfen
 - [ ] Weitere Tooltips für Einstellungen ergänzen
 - [ ] Kontrastwerte im Dark-Theme testen
+- [ ] Farbschema weiter an Vorlage anpassen
+- [ ] Module als Kartenlayout darstellen

@@ -17,8 +17,8 @@
   --fs-lg: 22px;
   --fs-xl: 28px;
   --radius: 12px;
-  --sidebar-width: 240px;
-  --info-width: 280px;
+  --sidebar-width: clamp(180px, 15vw, 220px);
+  --info-width: clamp(240px, 20vw, 300px);
   --header-height: 52px;
   --status-height: 24px;
   /* Standardfarbwerte (helles Theme). Diese werden bei anderen Themes überschrieben. */
@@ -48,16 +48,18 @@
 
 /* Dunkles Theme */
 html[data-theme="dunkel"] {
-  /* Dunkles Theme nach Vorbild der Layout‑Grafik: tiefblaues Grundlayout und farbige Akzente */
-  --bg: #0a2340;            /* Grundhintergrund: dunkles Nachtblau */
-  --panel: #031926;        /* Panels und Karten: etwas heller */
-  --text: #e6f0ff;         /* Haupttext: helles Blauweiß für hohen Kontrast */
-  --muted: #7d97b3;        /* Sekundärtext: gedämpftes Hellblau */
-  --border: #274472;       /* Linien: Mittelblau für klare Abgrenzung */
-  --nav-bg: #031926;       /* Navigationsleiste: wie Panels */
-  --nav-active-bg: var(--primary); /* Aktiver Eintrag in Akzentfarbe */
-  --nav-text: #8aa6c1;     /* Nav‑Text: mittleres Blau */
-  --nav-active-text: var(--btn-on-primary); /* Aktiver Eintrag: automatische Kontrastfarbe */
+  /* Dunkles Theme nach Vorbild der Layout‑Grafik: dunkles Blau-Grau und farbige Akzente */
+  --bg: #1b1f27;            /* Grundhintergrund: dunkles Blau-Grau */
+  --panel: #232b36;        /* Panels und Karten: etwas heller */
+  --text: #f0f0f0;         /* Haupttext: helles Grau für hohen Kontrast */
+  --muted: #9aa2b5;        /* Sekundärtext: gedämpftes Hellgrau */
+  --border: #2f3847;       /* Linien: Mittelgrau für klare Abgrenzung */
+  --nav-bg: #232b36;       /* Navigationsleiste: wie Panels */
+  --nav-active-bg: #1467b3; /* Aktiver Eintrag in Blau */
+  --nav-text: #d0d3e1;     /* Nav‑Text: helles Grau */
+  --nav-active-text: #ffffff; /* Aktiver Eintrag: Weiß */
+  --info-border: #5e3fdb;  /* Lila Rahmen für Info-Panel */
+  --primary: #1467b3;      /* Primärfarbe für Akzente */
   /* Status‑Hintergründe für Tage: frei/belegt */
   --free-bg: #2a0d0d;      /* Freie Tage: dunkles Weinrot */
   --free-bd: #8d2b2b;      /* Rahmen für freie Tage: kräftiges Rot */
@@ -145,7 +147,8 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: var(--panel);
+  background: rgba(35, 43, 54, 0.9);
+  backdrop-filter: blur(4px);
   border-bottom: 2px solid var(--border);
   padding: 0 .75rem;
   z-index: 50;
@@ -464,7 +467,7 @@ textarea:focus-visible {
 /* Info‑Panel (Dashboard) */
 #info-panel {
   background: var(--panel);
-  border-left: 2px solid var(--border);
+  border-left: 4px solid var(--info-border);
   padding: 1rem;
   overflow-y: auto;
 }

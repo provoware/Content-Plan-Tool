@@ -75,6 +75,17 @@
     }
   }
 
+  // Prüfe Unterstützung für Browser-Speicher und weise darauf hin
+  if (!('localStorage' in window)) {
+    const st = document.getElementById('status');
+    if (st) st.textContent = 'Warnung: kein Browser-Speicher verfügbar';
+  }
+  // Globales Fehler-Handling: zeige Meldung im Statusbereich
+  window.addEventListener('error', e => {
+    const st = document.getElementById('status');
+    if (st) st.textContent = 'Fehler: ' + e.message;
+  });
+
   /* Zustand laden oder initialisieren */
   let state = loadState() || initState(today.getFullYear());
 
