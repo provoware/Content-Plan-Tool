@@ -20,10 +20,10 @@ function run(cmd, args){
   });
 }
 
-async function ensureNode(){
-  const major = parseInt(process.versions.node.split('.')[0], 10);
+async function ensureNode(ver = process.versions.node){
+  const major = parseInt(ver.split('.')[0], 10);
   if(major < 18) throw new Error('Node >=18 erforderlich');
-  console.log('Node-Version erkannt:', process.versions.node);
+  console.log('Node-Version erkannt:', ver);
 }
 
 async function ensureDependencies(){
@@ -50,24 +50,28 @@ async function runTests(){
   await run('npm', ['test']);
 }
 
-(async()=>{
-  console.log('Startroutine: Vorprüfung der Umgebung…');
-  try{
-    await ensureNode();
-    await ensureDependencies();
-    console.log('Vorprüfung abgeschlossen.');
-    await runTests();
-    console.log('Nachprüfung erfolgreich. Umgebung bereit.');
-  } catch(err){
-    console.error('Startroutine fehlgeschlagen:', err.message);
+if(require.main === module){
+  (async()=>{
+    console.log('Startroutine: Vorprüfung der Umgebung…');
     try{
-      console.log('Versuche Selbstreparatur…');
+      await ensureNode();
       await ensureDependencies();
+      console.log('Vorprüfung abgeschlossen.');
       await runTests();
-      console.log('Selbstreparatur erfolgreich.');
-    } catch(e){
-      console.error('Selbstreparatur gescheitert:', e.message);
-      process.exitCode = 1;
+      console.log('Nachprüfung erfolgreich. Umgebung bereit.');
+    } catch(err){
+      console.error('Startroutine fehlgeschlagen:', err.message);
+      try{
+        console.log('Versuche Selbstreparatur…');
+        await ensureDependencies();
+        await runTests();
+        console.log('Selbstreparatur erfolgreich.');
+      } catch(e){
+        console.error('Selbstreparatur gescheitert:', e.message);
+        process.exitCode = 1;
+      }
     }
-  }
-})();
+  })();
+}
+
+module.exports = {run, ensureNode, ensureDependencies, runTests};
