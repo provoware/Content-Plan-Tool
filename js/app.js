@@ -25,6 +25,7 @@
   const FS_KEY = 'provoware_fs';
   const PALETTE_KEY = 'provoware_palette';
   const TIMEFMT_KEY = 'provoware_timefmt';
+  const THEMES = ['hell', 'dunkel', 'kontrast'];
 
   /* Farben für Monatsrahmen und Überschriften. Diese Liste wird
      zyklisch verwendet, um jedem Monat eine eigene Akzentfarbe
@@ -273,6 +274,9 @@
 
   /* Theme & Palette anwenden */
   function applyTheme(val) {
+    if (!THEMES.includes(val)) {
+      val = 'hell';
+    }
     document.documentElement.setAttribute('data-theme', val);
     state.theme = val;
     safeSet(THEME_KEY, val);
@@ -1424,8 +1428,8 @@
     });
     // Theme
     const themeSel = byId('theme');
-    themeSel.value = state.theme;
-    applyTheme(state.theme);
+    themeSel.value = THEMES.includes(state.theme) ? state.theme : 'hell';
+    applyTheme(themeSel.value);
     themeSel.addEventListener('change', e => {
       applyTheme(e.target.value);
       persistState();

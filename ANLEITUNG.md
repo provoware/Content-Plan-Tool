@@ -51,7 +51,7 @@ Im Bereich **Einstellungen** stehen dir folgende Optionen zur Verfügung:
 | Einstellung      | Beschreibung                                          |
 |-----------------|--------------------------------------------------------|
 | Jahr            | Wählt das Kalenderjahr aus (±3 Jahre um das aktuelle).|
-| Theme           | Drei Farbschemata: Hell, Dunkel und Kontrast.         |
+| Theme           | Drei Farbschemata: Hell, Dunkel und Kontrast. Beim ersten Start richtet sich die Auswahl nach deinem System (hell oder dunkel). |
 | Akzentfarbe     | Blau, Grün, Violett oder Rot. Beeinflusst Highlights. |
 | Textgröße       | Vier Skalierungen von 100 % bis 137 %.                 |
 | Daten löschen   | Setzt alle Einträge und Einstellungen zurück.         |
@@ -91,6 +91,7 @@ Die Anwendung überprüft beim Laden automatisch den Zustand der gespeicherten D
 * **Schriftgrößen:** Wähle unter Einstellungen die für dich passende Textgröße. Große Tageszahlen erleichtern das Lesen.
 * **Responsive Design:** Auf kleineren Bildschirmen fährt die Navigationsleiste ein; das Info‑Panel wird ausgeblendet, um Platz zu sparen.
 * **Klar beschriftete Bereiche:** Jede Sektion verfügt über eine Überschrift, und Formulare sind mit Labels versehen. Tooltips erklären Funktionen.
+* **Reduzierte Bewegung:** Wenn dein System „Weniger Bewegung“ vorgibt, werden Animationen und Übergänge abgeschaltet.
 
 Wir wünschen dir viel Erfolg bei der Planung deiner Inhalte mit dem Jahrescontent‑Kalender!
 
