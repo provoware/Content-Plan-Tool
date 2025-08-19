@@ -308,6 +308,24 @@ textarea:focus-visible {
 .month.hidden {
   display: none;
 }
+.month.fullscreen {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 300;
+  background: var(--panel);
+  overflow: auto;
+  font-size: 1.2rem;
+}
+[data-fullscreen] #sidebar,
+[data-fullscreen] #info-panel {
+  display: none;
+}
+[data-fullscreen] #layout {
+  grid-template-columns: 1fr;
+}
 .month.used-all {
   border-color: var(--used-bd);
 }

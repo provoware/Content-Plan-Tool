@@ -458,7 +458,7 @@
         <div class="month-stats" id="stats-${m}">—</div>
         <div class="month-actions">
           <button type="button" class="btn-max" title="Monat maximieren">Max</button>
-          <button type="button" class="btn-full" title="Monat Vollbild">Vollbild</button>
+          <button type="button" class="btn-full" title="Monat als Vollbild öffnen (Esc schließt)" aria-pressed="false">Vollbild</button>
           <button type="button" class="btn-overview" title="Monatsübersicht öffnen">Info</button>
         </div>
       `;
@@ -609,21 +609,60 @@
           }
         });
       });
-      monthEl.querySelector('.btn-full').addEventListener('click', () => toggleFullscreen(monthEl));
+      monthEl.querySelector('.btn-full').addEventListener('click', ev => toggleFullscreen(monthEl, ev.currentTarget));
       monthEl.querySelector('.btn-overview').addEventListener('click', () => openOverview('month', m));
       updateMonthStats(m);
     });
   }
-  function toggleFullscreen(monthEl) {
-    const isFull = monthEl.classList.contains('fullscreen');
+  let currentFullscreen = null;
+  function requestFs(el) {
+    const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen || el.mozRequestFullScreen;
+    if (fn) return fn.call(el);
+    return Promise.reject(new Error('Fullscreen API nicht verfügbar'));
+  }
+  function exitFs() {
+    const fn = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen || document.mozCancelFullScreen;
+    return fn ? fn.call(document) : Promise.resolve();
+  }
+  function toggleFullscreen(monthEl, btn) {
+    const isFull = currentFullscreen === monthEl;
     if (isFull) {
-      monthEl.classList.remove('fullscreen');
-      document.body.removeAttribute('data-fullscreen');
+      exitFs().catch(() => {}).finally(() => {
+        monthEl.classList.remove('fullscreen');
+        document.body.removeAttribute('data-fullscreen');
+        btn?.setAttribute('aria-pressed', 'false');
+        currentFullscreen = null;
+      });
     } else {
-      monthEl.classList.add('fullscreen');
-      document.body.setAttribute('data-fullscreen', '1');
+      requestFs(monthEl).then(() => {
+        monthEl.classList.add('fullscreen');
+        document.body.setAttribute('data-fullscreen', '1');
+        btn?.setAttribute('aria-pressed', 'true');
+        currentFullscreen = monthEl;
+      }).catch(err => {
+        console.warn('Fullscreen fehlgeschlagen', err);
+        updateStatus('Vollbild nicht möglich');
+        monthEl.classList.add('fullscreen');
+        document.body.setAttribute('data-fullscreen', '1');
+        btn?.setAttribute('aria-pressed', 'true');
+        currentFullscreen = monthEl;
+      });
     }
   }
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && currentFullscreen) {
+      currentFullscreen.classList.remove('fullscreen');
+      document.body.removeAttribute('data-fullscreen');
+      const b = currentFullscreen.querySelector('.btn-full');
+      if (b) b.setAttribute('aria-pressed', 'false');
+      currentFullscreen = null;
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && currentFullscreen) {
+      toggleFullscreen(currentFullscreen, currentFullscreen.querySelector('.btn-full'));
+    }
+  });
   function isUsed(it) {
     if (!it) return false;
     if ((it.title && it.title.trim()) || (it.desc && it.desc.trim()) || (it.tags && it.tags.trim())) return true;
