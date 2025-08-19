@@ -1,0 +1,15 @@
+{
+  "naming": {
+    "files": "kebab-case",
+    "variables": "camelCase",
+    "constants": "UPPER_SNAKE_CASE"
+  },
+  "structure": {
+    "modules": "one folder per feature",
+    "styles": "CSS variables with theme overrides"
+  },
+  "accessibility": {
+    "contrastRatio": ">=4.5",
+    "focusStyle": "visible focus ring"
+  }
+}

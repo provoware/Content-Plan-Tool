@@ -5,3 +5,5 @@
 - [x] Module als Kartenlayout darstellen
 - [ ] Weitere Tests für Kalenderfunktionen ergänzen
 - [ ] Kartenbarrierefreiheit überprüfen
+- [x] JSON-Manifeste für Standards, Erweiterungen und Anleitung hinzufügen
+- [ ] Hilfsfunktionen zentralisieren

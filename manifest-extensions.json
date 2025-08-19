@@ -1,0 +1,8 @@
+{
+  "updatePolicy": "semantic versioning",
+  "extensions": [],
+  "guidelines": [
+    "document changes in CHANGELOG.md",
+    "use feature flags for optional modules"
+  ]
+}

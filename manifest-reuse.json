@@ -1,0 +1,11 @@
+{
+  "principle": "DRY (Don't Repeat Yourself)",
+  "approach": [
+    "gemeinsame Funktionen in eigene Module auslagern",
+    "Hilfsfunktionen erneut verwenden statt zu kopieren"
+  ],
+  "examples": [
+    "$: Element mit CSS-Selektor finden",
+    "safeGet: Zugriff auf Browser-Speicher mit Fallback"
+  ]
+}

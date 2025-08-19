@@ -1,0 +1,20 @@
+{
+  "commands": [
+    {"cmd": "npm test", "explanation": "prüft die Funktionen automatisch"},
+    {"cmd": "node --check app.js", "explanation": "sucht nach Syntaxfehlern"},
+    {"cmd": "open index.html", "explanation": "startet die Anwendung im Browser"}
+  ],
+  "functions": [
+    {"name": "safeGet", "explanation": "liest Daten aus dem Speicher"},
+    {"name": "safeSet", "explanation": "schreibt Daten in den Speicher"},
+    {"name": "hexToRgb", "explanation": "wandelt Farbe von Hex (Farbcode) zu RGB (rot grün blau)"}
+  ],
+  "elements": [
+    {"id": "menu-toggle", "explanation": "öffnet die Navigation"},
+    {"id": "btn-add-title", "explanation": "fügt ein weiteres Titelfeld hinzu"}
+  ],
+  "tips": [
+    "Nutze die Seitenleiste, um schnell zu Kalender oder Einstellungen zu wechseln.",
+    "Speichere regelmäßig ein Backup über den Disketten-Button."
+  ]
+}

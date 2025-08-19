@@ -42,7 +42,7 @@
   --today-bg: #fef3c7;
   --today-bd: #fde68a;
   --note-bg: #f1f5f9;
-  --focus-ring: 3px solid #14b8a6;
+  --focus-ring: 3px solid #f59e0b;
   --btn-on-primary: #ffffff;
 }
 
@@ -133,6 +133,8 @@ textarea:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   * {
     animation: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     transition: none !important;
   }
 }

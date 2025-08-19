@@ -65,6 +65,8 @@
       localStorage.setItem(key, value);
     } catch (err) {
       memStore[key] = value;
+      updateStatus('Speichern im lokalen Speicher fehlgeschlagen, Fallback genutzt');
+      console.warn('localStorage set failed', err);
     }
   }
   function safeRemove(key) {
