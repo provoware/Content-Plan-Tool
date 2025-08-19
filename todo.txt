@@ -7,3 +7,7 @@
 - [ ] Kartenbarrierefreiheit überprüfen
 - [x] JSON-Manifeste für Standards, Erweiterungen und Anleitung hinzufügen
 - [ ] Hilfsfunktionen zentralisieren
+- [x] Projektstruktur bereinigen (Ordner und Pfad-Fallbacks)
+- [x] Print-CSS einbinden
+- [x] Fokus-Stile und Zielgrößen verbessern
+- [x] Undo/Redo-Grundlage anlegen

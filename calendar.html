@@ -6,7 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <title>Kalender – Monatsansicht</title>
-  <link rel="stylesheet" href="assets/app.css">
+  <link rel="stylesheet" href="css/app.css" onerror="this.href='app.css'">
+  <link rel="stylesheet" href="css/print.css" media="print" onerror="this.href='print.css'">
 </head>
 <body>
   <a class="skip-link" href="#main">Zum Inhalt springen</a>
@@ -134,7 +135,7 @@
     <small>Tastatur: <kbd>t</kbd> Filter an/aus · <kbd>Esc</kbd> Overlay schließen · <kbd>Enter</kbd> aktiviert Buttons</small>
   </footer>
 
-  <script type="module" src="assets/calendar.js" defer></script>
+  <script type="module" src="js/calendar.js" defer onerror="this.src='calendar.js'"></script>
   <script>document.getElementById('ov-close').addEventListener('click', ()=> document.getElementById('overlay').hidden=true);</script>
 </body>
 </html>

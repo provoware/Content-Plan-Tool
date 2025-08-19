@@ -697,6 +697,8 @@ button {
   color: var(--text);
   font-size: var(--fs-base);
   padding: .45rem .75rem;
+  min-width: 44px;
+  min-height: 44px;
   border-radius: var(--radius);
   cursor: pointer;
   transition: background-color .15s ease, color .15s ease;
@@ -735,7 +737,7 @@ select, input[type="text"], textarea {
   width: 100%;
 }
 
-select:focus, input:focus, textarea:focus, button:focus {
+select:focus, input:focus, textarea:focus, button:focus, a:focus {
   outline: var(--focus-ring);
   outline-offset: 2px;
 }

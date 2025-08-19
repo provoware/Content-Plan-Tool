@@ -95,6 +95,9 @@
 
   /* Zustand laden oder initialisieren */
   let state = loadState() || initState(today.getFullYear());
+  let undoStack = [];
+  let redoStack = [];
+  let previousState = JSON.stringify(state);
 
   function initState(year) {
     return {
@@ -117,8 +120,12 @@
     }
   }
   function persistState() {
+    undoStack.push(previousState);
+    if (undoStack.length > 50) undoStack.shift();
+    redoStack.length = 0;
+    previousState = JSON.stringify(state);
     try {
-      safeSet(STORAGE_KEY, JSON.stringify(state));
+      safeSet(STORAGE_KEY, previousState);
       safeSet(THEME_KEY, state.theme);
       safeSet(FS_KEY, state.fontsize);
       safeSet(PALETTE_KEY, state.palette);
@@ -128,6 +135,44 @@
     }
     updateDashboard();
     // Debug‑Status aktualisieren
+    renderDebugStatus();
+  }
+
+  function undo() {
+    if (!undoStack.length) return;
+    redoStack.push(previousState);
+    previousState = undoStack.pop();
+    state = JSON.parse(previousState);
+    try {
+      safeSet(STORAGE_KEY, previousState);
+      safeSet(THEME_KEY, state.theme);
+      safeSet(FS_KEY, state.fontsize);
+      safeSet(PALETTE_KEY, state.palette);
+      updateStatus('Änderung rückgängig gemacht');
+    } catch (err) {
+      updateStatus('Rückgängig fehlgeschlagen');
+    }
+    renderCalendar();
+    updateDashboard();
+    renderDebugStatus();
+  }
+
+  function redo() {
+    if (!redoStack.length) return;
+    undoStack.push(previousState);
+    previousState = redoStack.pop();
+    state = JSON.parse(previousState);
+    try {
+      safeSet(STORAGE_KEY, previousState);
+      safeSet(THEME_KEY, state.theme);
+      safeSet(FS_KEY, state.fontsize);
+      safeSet(PALETTE_KEY, state.palette);
+      updateStatus('Wiederhergestellt');
+    } catch (err) {
+      updateStatus('Wiederherstellen fehlgeschlagen');
+    }
+    renderCalendar();
+    updateDashboard();
     renderDebugStatus();
   }
   /* Auto‑Backup nach 5 Minuten, falls noch keines vorhanden */
@@ -1195,6 +1240,10 @@
         renderDebugStatus();
       });
     }
+    const undoBtn = byId('undo-btn');
+    if (undoBtn) undoBtn.addEventListener('click', undo);
+    const redoBtn = byId('redo-btn');
+    if (redoBtn) redoBtn.addEventListener('click', redo);
     // Autosave initial starten
     startAutoSave();
   }
@@ -1252,6 +1301,16 @@
     const tag = (e.target instanceof HTMLElement) ? e.target.tagName.toLowerCase() : '';
     if (tag === 'input' || tag === 'textarea' || e.target.hasAttribute('contenteditable')) {
       return; // keine Shortcuts während Eingabe
+    }
+    if (e.ctrlKey && e.key.toLowerCase() === 'z') {
+      e.preventDefault();
+      undo();
+      return;
+    }
+    if (e.ctrlKey && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
+      e.preventDefault();
+      redo();
+      return;
     }
     if (e.key === 'Escape') {
       if (byId('drawer').classList.contains('open')) {

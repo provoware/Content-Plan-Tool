@@ -1,0 +1,6 @@
+/* css/print.css – optimierte Darstellung für den Druck */
+@media print {
+  body { font-size: 12pt; color: #000; }
+  nav, #info-panel, .drawer, .modal, .bottom-actions { display: none !important; }
+  a:link:after, a:visited:after { content: " (" attr(href) ")"; }
+}

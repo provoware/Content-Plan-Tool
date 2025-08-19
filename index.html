@@ -13,7 +13,8 @@
     sodass Themen und Akzentfarben ohne tiefe Eingriffe angepasst werden können. Für Barrierefreiheit
     sorgen ausreichende Kontraste, große Interaktionsflächen und sinnvolle Aria‑Attribute.
   -->
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="css/styles.css" onerror="this.href='styles.css'" />
+  <link rel="stylesheet" href="css/print.css" media="print" onerror="this.href='print.css'" />
 </head>
 <body>
   <a href="#main" class="skip-link">Zum Inhalt springen</a>
@@ -122,6 +123,8 @@
             <button id="export-log" type="button" class="secondary small">Log exportieren</button>
             <button id="clear-storage-btn" type="button" class="warn small">Speicher zurücksetzen</button>
             <button id="autosave-toggle" type="button" class="secondary small">Autosave deaktivieren</button>
+            <button id="undo-btn" type="button" class="secondary small" title="Letzte Aktion rückgängig machen">Undo</button>
+            <button id="redo-btn" type="button" class="secondary small" title="Rückgängig gemachte Aktion wiederholen">Redo</button>
           </div>
           <div id="debug-results" class="list"></div>
         </div>
@@ -188,7 +191,7 @@
       <div class="modal-content" id="modal-content"></div>
     </div>
   </section>
-  <script src="colors.js"></script>
-  <script src="app.js"></script>
+  <script src="js/colors.js" onerror="this.src='colors.js'"></script>
+  <script src="js/app.js" onerror="this.src='app.js'"></script>
 </body>
 </html>
