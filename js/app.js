@@ -25,7 +25,6 @@
   const FS_KEY = 'provoware_fs';
   const PALETTE_KEY = 'provoware_palette';
   const TIMEFMT_KEY = 'provoware_timefmt';
-  const THEMES = ['hell', 'dunkel', 'kontrast'];
 
   /* Farben für Monatsrahmen und Überschriften. Diese Liste wird
      zyklisch verwendet, um jedem Monat eine eigene Akzentfarbe
@@ -115,7 +114,7 @@
       year: year,
       items: {},
       log: [],
-      theme: safeGet(THEME_KEY) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dunkel' : 'hell'),
+      theme: normalizeTheme(safeGet(THEME_KEY) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dunkel' : 'hell')),
       fontsize: safeGet(FS_KEY) || '16',
       palette: safeGet(PALETTE_KEY) || 'blue'
     };
@@ -274,9 +273,7 @@
 
   /* Theme & Palette anwenden */
   function applyTheme(val) {
-    if (!THEMES.includes(val)) {
-      val = 'hell';
-    }
+    val = normalizeTheme(val);
     document.documentElement.setAttribute('data-theme', val);
     state.theme = val;
     safeSet(THEME_KEY, val);
@@ -562,7 +559,7 @@
         <div class="month-stats" id="stats-${m}">—</div>
         <div class="month-actions">
           <button type="button" class="btn-max" title="Monat maximieren">Max</button>
-          <button type="button" class="btn-full" title="Monat als Vollbild öffnen (Esc schließt)" aria-pressed="false">Vollbild</button>
+          <button type="button" class="btn-full" title="Monat als Vollbild öffnen (Esc schließt)" aria-label="Vollbild umschalten" aria-pressed="false">Vollbild</button>
           <button type="button" class="btn-overview" title="Monatsübersicht öffnen">Info</button>
         </div>
       `;
@@ -736,13 +733,23 @@
         document.body.removeAttribute('data-fullscreen');
         btn?.setAttribute('aria-pressed', 'false');
         currentFullscreen = null;
+        updateStatus('Vollbild beendet');
       });
     } else {
+      if (!document.fullscreenEnabled) {
+        monthEl.classList.add('fullscreen');
+        document.body.setAttribute('data-fullscreen', '1');
+        btn?.setAttribute('aria-pressed', 'true');
+        currentFullscreen = monthEl;
+        updateStatus('Vollbild (Fallback)');
+        return;
+      }
       requestFs(monthEl).then(() => {
         monthEl.classList.add('fullscreen');
         document.body.setAttribute('data-fullscreen', '1');
         btn?.setAttribute('aria-pressed', 'true');
         currentFullscreen = monthEl;
+        updateStatus('Vollbild aktiviert');
       }).catch(err => {
         console.warn('Fullscreen fehlgeschlagen', err);
         updateStatus('Vollbild nicht möglich');
@@ -759,6 +766,7 @@
       document.body.removeAttribute('data-fullscreen');
       const b = currentFullscreen.querySelector('.btn-full');
       if (b) b.setAttribute('aria-pressed', 'false');
+      updateStatus('Vollbild beendet');
       currentFullscreen = null;
     }
   });
@@ -1428,7 +1436,7 @@
     });
     // Theme
     const themeSel = byId('theme');
-    themeSel.value = THEMES.includes(state.theme) ? state.theme : 'hell';
+    themeSel.value = normalizeTheme(state.theme);
     applyTheme(themeSel.value);
     themeSel.addEventListener('change', e => {
       applyTheme(e.target.value);
