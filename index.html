@@ -22,7 +22,7 @@
   <header id="top-bar" role="banner">
     <button id="menu-toggle" aria-label="Navigation umschalten" title="Seitenleiste ein- oder ausblenden">☰</button>
     <h1 class="title" tabindex="0">Jahrescontent‑Kalender</h1>
-    <div id="status" aria-live="polite">Status: Lädt …</div>
+    <div id="status" role="status" aria-live="polite">Status: Lädt …</div>
   </header>
   <div id="layout">
     <!-- Linke Navigationsleiste -->
@@ -123,8 +123,8 @@
             <button id="export-log" type="button" class="secondary small">Log exportieren</button>
             <button id="clear-storage-btn" type="button" class="warn small">Speicher zurücksetzen</button>
             <button id="autosave-toggle" type="button" class="secondary small">Autosave deaktivieren</button>
-            <button id="undo-btn" type="button" class="secondary small" title="Letzte Aktion rückgängig machen (Strg/Cmd+Z)" disabled aria-disabled="true">Undo</button>
-            <button id="redo-btn" type="button" class="secondary small" title="Rückgängig gemachte Aktion wiederholen (Strg/Cmd+Y)" disabled aria-disabled="true">Redo</button>
+            <button id="undo-btn" type="button" class="secondary small" title="Letzte Aktion rückgängig machen (Strg/Cmd+Z)" disabled aria-disabled="true">↶ Undo</button>
+            <button id="redo-btn" type="button" class="secondary small" title="Rückgängig gemachte Aktion wiederholen (Strg/Cmd+Y)" disabled aria-disabled="true">↷ Redo</button>
           </div>
           <div id="debug-results" class="list"></div>
         </div>
@@ -191,6 +191,7 @@
       <div class="modal-content" id="modal-content"></div>
     </div>
   </section>
+  <script src="js/history.js" onerror="this.src='history.js'"></script>
   <script src="js/colors.js" onerror="this.src='colors.js'"></script>
   <script src="js/app.js" onerror="this.src='app.js'"></script>
 </body>

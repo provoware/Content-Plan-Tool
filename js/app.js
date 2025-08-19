@@ -95,9 +95,16 @@
 
   /* Zustand laden oder initialisieren */
   let state = loadState() || initState(today.getFullYear());
-  let undoStack = [];
-  let redoStack = [];
+  const history = typeof createHistory === 'function' ? createHistory() : {
+    push() {},
+    undo() { return null; },
+    redo() { return null; },
+    canUndo() { return false; },
+    canRedo() { return false; },
+    getCurrent() { return null; }
+  };
   let previousState = JSON.stringify(state);
+  history.push(previousState);
 
   function initState(year) {
     return {
@@ -120,9 +127,7 @@
     }
   }
   function persistState() {
-    undoStack.push(previousState);
-    if (undoStack.length > 50) undoStack.shift();
-    redoStack.length = 0;
+    history.push(previousState);
     previousState = JSON.stringify(state);
     try {
       safeSet(STORAGE_KEY, previousState);
@@ -140,12 +145,12 @@
   }
 
   function undo() {
-    if (!undoStack.length) {
+    const prev = history.undo();
+    if (!prev) {
       updateStatus('Nichts zum Rückgängigmachen');
       return;
     }
-    redoStack.push(previousState);
-    previousState = undoStack.pop();
+    previousState = prev;
     state = JSON.parse(previousState);
     try {
       safeSet(STORAGE_KEY, previousState);
@@ -163,12 +168,12 @@
   }
 
   function redo() {
-    if (!redoStack.length) {
+    const next = history.redo();
+    if (!next) {
       updateStatus('Nichts zum Wiederholen');
       return;
     }
-    undoStack.push(previousState);
-    previousState = redoStack.pop();
+    previousState = next;
     state = JSON.parse(previousState);
     try {
       safeSet(STORAGE_KEY, previousState);
@@ -188,13 +193,13 @@
   function updateUndoRedoButtons() {
     const undoBtn = byId('undo-btn');
     if (undoBtn) {
-      const dis = !undoStack.length;
+      const dis = !history.canUndo();
       undoBtn.disabled = dis;
       undoBtn.setAttribute('aria-disabled', dis ? 'true' : 'false');
     }
     const redoBtn = byId('redo-btn');
     if (redoBtn) {
-      const dis = !redoStack.length;
+      const dis = !history.canRedo();
       redoBtn.disabled = dis;
       redoBtn.setAttribute('aria-disabled', dis ? 'true' : 'false');
     }

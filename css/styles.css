@@ -170,7 +170,8 @@ textarea:focus-visible {
 }
 #top-bar #status {
   font-size: var(--fs-sm);
-  color: var(--muted);
+  color: var(--accent);
+  font-weight: 600;
 }
 
 /* Layout: drei Spalten unterhalb des Headers */
@@ -756,8 +757,8 @@ button.secondary {
   color: var(--text);
 }
 button.secondary:hover {
-  background: var(--nav-active-bg);
-  color: var(--nav-active-text);
+  background: var(--accent);
+  color: var(--btn-on-primary);
 }
 
 /* Inputs */

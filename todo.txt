@@ -14,4 +14,4 @@
 - [x] Datum und Uhrzeit im Dashboard anzeigen
 - [x] Vollbildfunktion verbessern und testen
 - [x] Undo/Redo Buttons deaktivieren, wenn Verlauf leer
-- [ ] Undo/Redo Tests ergänzen
+ - [x] Undo/Redo Tests ergänzen

@@ -62,9 +62,13 @@ Die Einstellungen werden sofort angewandt und gespeichert. Sollte dein Browser k
 | <kbd>T</kbd> | Springt zum heutigen Datum und öffnet den Editor.        |
 | <kbd>F</kbd> | Springt zum nächsten freien Tag und öffnet den Editor.    |
 | <kbd>S</kbd> | Speichert den aktuellen Zustand manuell.                 |
+| <kbd>Strg</kbd>/<kbd>Cmd</kbd>+<kbd>Z</kbd> | Letzte Aktion rückgängig (Undo ↶). |
+| <kbd>Strg</kbd>/<kbd>Cmd</kbd>+<kbd>Y</kbd> | Rückgängig gemachte Aktion wiederholen (Redo ↷). |
 | <kbd>Esc</kbd> | Schließt geöffnete Dialoge (Drawer oder Übersicht).      |
 
 Die Tastenkürzel sind deaktiviert, solange du dich in einem Eingabefeld befindest, damit sie nicht versehentlich ausgelöst werden.
+
+Die Buttons ↶ Undo und ↷ Redo findest du im Bereich „Debug“. Sie sind grau, solange kein Verlauf vorhanden ist.
 
 ## 6 – Export und Import
 
