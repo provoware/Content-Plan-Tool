@@ -3,4 +3,5 @@
   body { font-size: 12pt; color: #000; }
   nav, #info-panel, .drawer, .modal, .bottom-actions { display: none !important; }
   a:link:after, a:visited:after { content: " (" attr(href) ")"; }
+  #dash-clock { display: none; }
 }

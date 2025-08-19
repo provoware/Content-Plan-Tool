@@ -379,7 +379,7 @@
     container.innerHTML = `
       <div class="dash-section">
         <div class="dash-title">Jetzt</div>
-        <time id="dash-clock" class="pill" datetime="" title="Aktuelles Datum und Uhrzeit" aria-live="polite"></time>
+        <time id="dash-clock" class="pill" datetime="" title="Aktuelles Datum und Uhrzeit – zum Kopieren klicken" aria-live="polite" role="timer" tabindex="0" aria-label="Aktuelle Uhrzeit und Datum">--:--</time>
       </div>
       <div class="dash-section">
         <div class="dash-title">Aktueller Monat</div>
@@ -436,6 +436,11 @@
       }
     });
     byId('btn-scan-dupes')?.addEventListener('click', scanDuplicates);
+    const clk = byId('dash-clock');
+    if (clk) {
+      clk.onclick = copyClock;
+      clk.onkeydown = e => { if (e.key === 'Enter') copyClock(); };
+    }
     // Notes persistence
     const notesArea = byId('notes');
     if (notesArea) {
@@ -453,10 +458,27 @@
     if (!clock) return;
     try {
       const now = new Date();
-      clock.textContent = now.toLocaleString(navigator.language || 'de-DE');
+      const fmt = new Intl.DateTimeFormat(navigator.language || 'de-DE', { dateStyle: 'medium', timeStyle: 'medium' });
+      const txt = fmt.format(now);
+      clock.textContent = txt;
       clock.dateTime = now.toISOString();
+      clock.setAttribute('aria-label', 'Aktuell ' + txt);
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      clock.title = `Aktuelles Datum und Uhrzeit – Zeitzone: ${tz} – zum Kopieren klicken`;
     } catch (err) {
       clock.textContent = 'Zeit unbekannt';
+      clock.setAttribute('aria-label', 'Zeit unbekannt');
+    }
+  }
+
+  function copyClock() {
+    const clock = byId('dash-clock');
+    if (!clock) return;
+    try {
+      navigator.clipboard.writeText(clock.textContent || '');
+      updateStatus('Datum/Uhrzeit kopiert');
+    } catch (err) {
+      updateStatus('Kopieren nicht möglich');
     }
   }
 

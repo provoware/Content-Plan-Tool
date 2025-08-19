@@ -124,7 +124,8 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 select:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+time:focus-visible {
   outline: var(--focus-ring);
   outline-offset: 2px;
 }
@@ -541,6 +542,8 @@ textarea:focus-visible {
   font-weight: bold;
   color: var(--accent);
   border-color: var(--accent);
+  min-width: 10ch;
+  text-align: center;
 }
 .dash-container .legend {
   display: flex;

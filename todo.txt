@@ -14,4 +14,6 @@
 - [x] Datum und Uhrzeit im Dashboard anzeigen
 - [x] Vollbildfunktion verbessern und testen
 - [x] Undo/Redo Buttons deaktivieren, wenn Verlauf leer
- - [x] Undo/Redo Tests ergänzen
+- [x] Undo/Redo Tests ergänzen
+- [x] Uhr barrierefrei und kopierbar machen
+- [ ] Option für andere Zeitformate (z.B. 12/24 h)
