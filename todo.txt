@@ -1,0 +1,3 @@
+- [ ] Skip-Link in weiteren Seiten prüfen
+- [ ] Weitere Tooltips für Einstellungen ergänzen
+- [ ] Kontrastwerte im Dark-Theme testen

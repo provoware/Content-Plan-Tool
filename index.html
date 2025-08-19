@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
   <title>Jahrescontent‑Kalender</title>
   <!--
     Die HTML‑Struktur orientiert sich am in LAYOUT.png gezeigten Drei‑Spalten‑Aufbau: eine feste
@@ -15,6 +16,7 @@
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <a href="#main" class="skip-link">Zum Inhalt springen</a>
   <!-- Oberer Balken mit Markenname und Statusanzeige -->
   <header id="top-bar" role="banner">
     <button id="menu-toggle" aria-label="Navigation umschalten">☰</button>
@@ -136,11 +138,11 @@
     <header>
       <h3 id="drawer-title">Tag bearbeiten</h3>
       <div class="toolbar">
-        <button id="btn-quick-used" class="secondary">Belegt</button>
-        <button id="btn-quick-free" class="secondary">Frei</button>
-        <button id="btn-drawer-save">Speichern</button>
-        <button id="btn-drawer-clear" class="secondary">Leeren</button>
-        <button id="btn-drawer-close" class="secondary">Schließen</button>
+        <button id="btn-quick-used" class="secondary" title="Markiert den Tag als belegt">Belegt</button>
+        <button id="btn-quick-free" class="secondary" title="Markiert den Tag als frei">Frei</button>
+        <button id="btn-drawer-save" title="Änderungen speichern">Speichern</button>
+        <button id="btn-drawer-clear" class="secondary" title="Alle Felder leeren">Leeren</button>
+        <button id="btn-drawer-close" class="secondary" title="Dialog schließen">Schließen</button>
       </div>
     </header>
     <div class="drawer-body">
@@ -160,7 +162,8 @@
       </div>
       <div class="form-group">
         <label for="tags">Tags</label>
-        <input id="tags" type="text" placeholder="tag1,tag2" />
+        <input id="tags" type="text" placeholder="tag1,tag2" aria-describedby="tags-help" />
+        <small id="tags-help" class="muted">Mehrere Tags mit Komma trennen</small>
       </div>
       <hr />
       <div class="form-group">

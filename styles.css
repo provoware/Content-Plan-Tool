@@ -102,6 +102,39 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Skip-Link für Screenreader-Nutzer */
+.skip-link {
+  position: absolute;
+  left: 0;
+  top: -40px;
+  background: var(--primary);
+  color: var(--btn-on-primary);
+  padding: .5rem 1rem;
+  text-decoration: none;
+  z-index: 100;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* Sichtbarer Tastaturfokus */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+/* Bewegungen für Nutzer mit Bewegungseinschränkung minimieren */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 /* Top‑Bar */
 #top-bar {
   position: fixed;

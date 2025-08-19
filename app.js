@@ -83,7 +83,7 @@
       year: year,
       items: {},
       log: [],
-      theme: safeGet(THEME_KEY) || 'dunkel',
+      theme: safeGet(THEME_KEY) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dunkel' : 'hell'),
       fontsize: safeGet(FS_KEY) || '16',
       palette: safeGet(PALETTE_KEY) || 'blue'
     };
@@ -94,6 +94,7 @@
       const raw = safeGet(STORAGE_KEY);
       return raw ? JSON.parse(raw) : null;
     } catch (err) {
+      updateStatus('Zustand beschädigt, neu initialisiert');
       return null;
     }
   }
