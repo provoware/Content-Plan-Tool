@@ -24,6 +24,7 @@
   const THEME_KEY = 'provoware_theme';
   const FS_KEY = 'provoware_fs';
   const PALETTE_KEY = 'provoware_palette';
+  const TIMEFMT_KEY = 'provoware_timefmt';
 
   /* Farben für Monatsrahmen und Überschriften. Diese Liste wird
      zyklisch verwendet, um jedem Monat eine eigene Akzentfarbe
@@ -95,13 +96,25 @@
 
   /* Zustand laden oder initialisieren */
   let state = loadState() || initState(today.getFullYear());
+  const history = typeof createHistory === 'function' ? createHistory() : {
+    push() {},
+    undo() { return null; },
+    redo() { return null; },
+    canUndo() { return false; },
+    canRedo() { return false; },
+    getCurrent() { return null; }
+  };
+  let timeFormat = safeGet(TIMEFMT_KEY);
+  if (timeFormat !== '12' && timeFormat !== '24') timeFormat = '24';
+  let previousState = JSON.stringify(state);
+  history.push(previousState);
 
   function initState(year) {
     return {
       year: year,
       items: {},
       log: [],
-      theme: safeGet(THEME_KEY) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dunkel' : 'hell'),
+      theme: normalizeTheme(safeGet(THEME_KEY) || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dunkel' : 'hell')),
       fontsize: safeGet(FS_KEY) || '16',
       palette: safeGet(PALETTE_KEY) || 'blue'
     };
@@ -117,8 +130,10 @@
     }
   }
   function persistState() {
+    history.push(previousState);
+    previousState = JSON.stringify(state);
     try {
-      safeSet(STORAGE_KEY, JSON.stringify(state));
+      safeSet(STORAGE_KEY, previousState);
       safeSet(THEME_KEY, state.theme);
       safeSet(FS_KEY, state.fontsize);
       safeSet(PALETTE_KEY, state.palette);
@@ -129,6 +144,68 @@
     updateDashboard();
     // Debug‑Status aktualisieren
     renderDebugStatus();
+    updateUndoRedoButtons();
+  }
+
+  function undo() {
+    const prev = history.undo();
+    if (!prev) {
+      updateStatus('Nichts zum Rückgängigmachen');
+      return;
+    }
+    previousState = prev;
+    state = JSON.parse(previousState);
+    try {
+      safeSet(STORAGE_KEY, previousState);
+      safeSet(THEME_KEY, state.theme);
+      safeSet(FS_KEY, state.fontsize);
+      safeSet(PALETTE_KEY, state.palette);
+      updateStatus('Änderung rückgängig gemacht');
+    } catch (err) {
+      updateStatus('Rückgängig fehlgeschlagen');
+    }
+    renderCalendar();
+    updateDashboard();
+    renderDebugStatus();
+    updateUndoRedoButtons();
+  }
+
+  function redo() {
+    const next = history.redo();
+    if (!next) {
+      updateStatus('Nichts zum Wiederholen');
+      return;
+    }
+    previousState = next;
+    state = JSON.parse(previousState);
+    try {
+      safeSet(STORAGE_KEY, previousState);
+      safeSet(THEME_KEY, state.theme);
+      safeSet(FS_KEY, state.fontsize);
+      safeSet(PALETTE_KEY, state.palette);
+      updateStatus('Wiederhergestellt');
+    } catch (err) {
+      updateStatus('Wiederherstellen fehlgeschlagen');
+    }
+    renderCalendar();
+    updateDashboard();
+    renderDebugStatus();
+    updateUndoRedoButtons();
+  }
+
+  function updateUndoRedoButtons() {
+    const undoBtn = byId('undo-btn');
+    if (undoBtn) {
+      const dis = !history.canUndo();
+      undoBtn.disabled = dis;
+      undoBtn.setAttribute('aria-disabled', dis ? 'true' : 'false');
+    }
+    const redoBtn = byId('redo-btn');
+    if (redoBtn) {
+      const dis = !history.canRedo();
+      redoBtn.disabled = dis;
+      redoBtn.setAttribute('aria-disabled', dis ? 'true' : 'false');
+    }
   }
   /* Auto‑Backup nach 5 Minuten, falls noch keines vorhanden */
   setTimeout(() => {
@@ -196,6 +273,7 @@
 
   /* Theme & Palette anwenden */
   function applyTheme(val) {
+    val = normalizeTheme(val);
     document.documentElement.setAttribute('data-theme', val);
     state.theme = val;
     safeSet(THEME_KEY, val);
@@ -285,6 +363,7 @@
           buildSelectors();
           renderCalendar();
           renderDashboardStructure();
+          updateClock();
           updateDashboard();
           renderLog();
           updateStatus('Zurückgesetzt');
@@ -302,6 +381,13 @@
     if (!container) return;
     container.innerHTML = '';
     container.innerHTML = `
+      <div class="dash-section">
+        <div class="dash-title">Jetzt</div>
+        <div class="row">
+          <time id="dash-clock" class="pill" datetime="" title="Aktuelles Datum und Uhrzeit – zum Kopieren klicken" aria-live="polite" role="timer" tabindex="0" aria-label="Aktuelle Uhrzeit und Datum">--:--</time>
+          <button id="time-format-btn" class="pill" type="button" aria-pressed="false" title="Zeitformat 24 Stunden – klicken zum Umstellen">24 h</button>
+        </div>
+      </div>
       <div class="dash-section">
         <div class="dash-title">Aktueller Monat</div>
         <div class="row">
@@ -357,6 +443,17 @@
       }
     });
     byId('btn-scan-dupes')?.addEventListener('click', scanDuplicates);
+    const clk = byId('dash-clock');
+    if (clk) {
+      clk.onclick = copyClock;
+      clk.onkeydown = e => { if (e.key === 'Enter') copyClock(); };
+    }
+    const fmtBtn = byId('time-format-btn');
+    if (fmtBtn) {
+      fmtBtn.onclick = toggleTimeFormat;
+      fmtBtn.onkeydown = e => { if (e.key === 'Enter') toggleTimeFormat(); };
+      updateTimeFormatButton();
+    }
     // Notes persistence
     const notesArea = byId('notes');
     if (notesArea) {
@@ -366,6 +463,51 @@
         logEvent('Notizen gespeichert');
         renderLog();
       });
+    }
+  }
+
+  function updateClock() {
+    const clock = byId('dash-clock');
+    if (!clock) return;
+    try {
+      const now = new Date();
+      const txt = (typeof formatDateTime === 'function')
+        ? formatDateTime(now, timeFormat === '12')
+        : now.toLocaleString();
+      clock.textContent = txt;
+      clock.dateTime = now.toISOString();
+      clock.setAttribute('aria-label', 'Aktuell ' + txt);
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      clock.title = `Aktuelles Datum und Uhrzeit – Zeitzone: ${tz} – zum Kopieren klicken`;
+    } catch (err) {
+      clock.textContent = 'Zeit unbekannt';
+      clock.setAttribute('aria-label', 'Zeit unbekannt');
+    }
+  }
+
+  function updateTimeFormatButton() {
+    const btn = byId('time-format-btn');
+    if (!btn) return;
+    const is12 = timeFormat === '12';
+    btn.setAttribute('aria-pressed', String(is12));
+    btn.textContent = is12 ? '12 h' : '24 h';
+    btn.title = `Zeitformat ${is12 ? '12 Stunden' : '24 Stunden'} – klicken zum Umstellen`;
+  }
+
+  function toggleTimeFormat() {
+    timeFormat = timeFormat === '24' ? '12' : '24';
+    safeSet(TIMEFMT_KEY, timeFormat);
+    updateTimeFormatButton();
+    updateClock();
+    updateStatus('Zeitformat: ' + (timeFormat === '12' ? '12 Stunden' : '24 Stunden'));
+  }
+
+  function copyClock() {
+    const clock = byId('dash-clock');
+    if (!clock) return;
+    const text = clock.textContent || '';
+    if (typeof copyText === 'function') {
+      copyText(text, msg => updateStatus(msg.replace('Text', 'Datum/Uhrzeit')));
     }
   }
 
@@ -396,7 +538,7 @@
         <div class="month-stats" id="stats-${m}">—</div>
         <div class="month-actions">
           <button type="button" class="btn-max" title="Monat maximieren">Max</button>
-          <button type="button" class="btn-full" title="Monat Vollbild">Vollbild</button>
+          <button type="button" class="btn-full" title="Monat als Vollbild öffnen (Esc schließt, Strg+Shift+F)" aria-label="Vollbild umschalten" aria-pressed="false">Vollbild</button>
           <button type="button" class="btn-overview" title="Monatsübersicht öffnen">Info</button>
         </div>
       `;
@@ -547,21 +689,71 @@
           }
         });
       });
-      monthEl.querySelector('.btn-full').addEventListener('click', () => toggleFullscreen(monthEl));
+      monthEl.querySelector('.btn-full').addEventListener('click', ev => toggleFullscreen(monthEl, ev.currentTarget));
       monthEl.querySelector('.btn-overview').addEventListener('click', () => openOverview('month', m));
       updateMonthStats(m);
     });
   }
-  function toggleFullscreen(monthEl) {
-    const isFull = monthEl.classList.contains('fullscreen');
+  let currentFullscreen = null;
+  function requestFs(el) {
+    const fn = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen || el.mozRequestFullScreen;
+    if (fn) return fn.call(el);
+    return Promise.reject(new Error('Fullscreen API nicht verfügbar'));
+  }
+  function exitFs() {
+    const fn = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen || document.mozCancelFullScreen;
+    return fn ? fn.call(document) : Promise.resolve();
+  }
+  function toggleFullscreen(monthEl, btn) {
+    const isFull = currentFullscreen === monthEl;
     if (isFull) {
-      monthEl.classList.remove('fullscreen');
-      document.body.removeAttribute('data-fullscreen');
+      exitFs().catch(() => {}).finally(() => {
+        monthEl.classList.remove('fullscreen');
+        document.body.removeAttribute('data-fullscreen');
+        btn?.setAttribute('aria-pressed', 'false');
+        currentFullscreen = null;
+        updateStatus('Vollbild beendet');
+      });
     } else {
-      monthEl.classList.add('fullscreen');
-      document.body.setAttribute('data-fullscreen', '1');
+      if (typeof shouldFullscreenFallback === 'function' && shouldFullscreenFallback(document)) {
+        monthEl.classList.add('fullscreen');
+        document.body.setAttribute('data-fullscreen', '1');
+        btn?.setAttribute('aria-pressed', 'true');
+        currentFullscreen = monthEl;
+        updateStatus('Vollbild (Fallback)');
+        return;
+      }
+      requestFs(monthEl).then(() => {
+        monthEl.classList.add('fullscreen');
+        document.body.setAttribute('data-fullscreen', '1');
+        btn?.setAttribute('aria-pressed', 'true');
+        currentFullscreen = monthEl;
+        updateStatus('Vollbild aktiviert');
+      }).catch(err => {
+        console.warn('Fullscreen fehlgeschlagen', err);
+        updateStatus('Vollbild nicht möglich');
+        monthEl.classList.add('fullscreen');
+        document.body.setAttribute('data-fullscreen', '1');
+        btn?.setAttribute('aria-pressed', 'true');
+        currentFullscreen = monthEl;
+      });
     }
   }
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && currentFullscreen) {
+      currentFullscreen.classList.remove('fullscreen');
+      document.body.removeAttribute('data-fullscreen');
+      const b = currentFullscreen.querySelector('.btn-full');
+      if (b) b.setAttribute('aria-pressed', 'false');
+      updateStatus('Vollbild beendet');
+      currentFullscreen = null;
+    }
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && currentFullscreen) {
+      toggleFullscreen(currentFullscreen, currentFullscreen.querySelector('.btn-full'));
+    }
+  });
   function isUsed(it) {
     if (!it) return false;
     if ((it.title && it.title.trim()) || (it.desc && it.desc.trim()) || (it.tags && it.tags.trim())) return true;
@@ -1148,6 +1340,7 @@
   function initDebug() {
     // Render initial status
     renderDebugStatus();
+    updateUndoRedoButtons();
     // Self‑check button
     const runBtn = byId('run-selfcheck');
     if (runBtn) runBtn.addEventListener('click', () => {
@@ -1177,6 +1370,7 @@
         persistState();
         buildSelectors();
         renderDashboardStructure();
+        updateClock();
         renderCalendar();
         updateDashboard();
         renderLog();
@@ -1195,6 +1389,10 @@
         renderDebugStatus();
       });
     }
+    const undoBtn = byId('undo-btn');
+    if (undoBtn) undoBtn.addEventListener('click', undo);
+    const redoBtn = byId('redo-btn');
+    if (redoBtn) redoBtn.addEventListener('click', redo);
     // Autosave initial starten
     startAutoSave();
   }
@@ -1217,8 +1415,8 @@
     });
     // Theme
     const themeSel = byId('theme');
-    themeSel.value = state.theme;
-    applyTheme(state.theme);
+    themeSel.value = normalizeTheme(state.theme);
+    applyTheme(themeSel.value);
     themeSel.addEventListener('change', e => {
       applyTheme(e.target.value);
       persistState();
@@ -1252,6 +1450,28 @@
     const tag = (e.target instanceof HTMLElement) ? e.target.tagName.toLowerCase() : '';
     if (tag === 'input' || tag === 'textarea' || e.target.hasAttribute('contenteditable')) {
       return; // keine Shortcuts während Eingabe
+    }
+    const mod = e.ctrlKey || e.metaKey;
+    if (mod && e.key.toLowerCase() === 'z' && !e.shiftKey) {
+      e.preventDefault();
+      undo();
+      return;
+    }
+    if (mod && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
+      e.preventDefault();
+      redo();
+      return;
+    }
+    if (isFullscreenShortcut(e)) {
+      e.preventDefault();
+      const monthEl = currentFullscreen || (e.target.closest && e.target.closest('.month')) || document.querySelector('.month');
+      if (monthEl) {
+        const btn = monthEl.querySelector('.btn-full');
+        toggleFullscreen(monthEl, btn);
+      } else {
+        updateStatus('Kein Monat für Vollbild gefunden');
+      }
+      return;
     }
     if (e.key === 'Escape') {
       if (byId('drawer').classList.contains('open')) {
@@ -1341,6 +1561,8 @@
   renderDashboardStructure();
   renderCalendar();
   updateDashboard();
+  updateClock();
+  setInterval(updateClock, 1000);
   renderLog();
   updateStatus('Bereit');
   // Debug initialisieren (enthält Autosave‑Start)

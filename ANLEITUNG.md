@@ -7,11 +7,13 @@ Dieses Dokument erläutert die Verwendung des **Jahrescontent‑Kalenders** Schr
 Die Oberfläche ist in drei Spalten unterteilt:
 
 1. **Navigationsleiste (links)** – Über die Schaltflächen gelangst du zu den Bereichen **Kalender**, **Einstellungen** und **Hilfe**. Unten findest du Buttons für **Backup** (JSON‑Export) und **Abmelden** (Daten zurücksetzen).
-   Zusätzlich gibt es einen Bereich **Debug**. In diesem Diagnosebereich kannst du den Zustand überprüfen (Self‑Check), das Ereignislog exportieren, den Speicher zurücksetzen und das automatische Backup ein‑ oder ausschalten.
+   Zusätzlich gibt es einen Bereich **Debug**. In diesem Diagnosebereich kannst du den Zustand überprüfen (Self‑Check), das Ereignislog exportieren, den Speicher zurücksetzen und das automatische Backup ein‑ oder ausschalten. Die großen Schaltflächen besitzen erklärende Hinweise, die beim Überfahren erscheinen (Tooltips).
 2. **Arbeitsbereich (Mitte)** – Hier wird je nach Auswahl der entsprechende Inhalt angezeigt. Standardmäßig ist der Kalender aktiv.
 3. **Info‑Panel (rechts)** – Dieses Panel zeigt das Dashboard mit Statistiken zum aktuellen Monat, eine Liste offener Tage, anstehende To‑Dos, deine persönlichen Notizen, das Ereignislog und eine kleine Tippsektion.
 
 Am oberen Rand befindet sich ein fester **Kopfbereich** mit einem Navigations‑Toggle (nur auf kleinen Bildschirmen sichtbar), dem Titel der Anwendung und einer Statusanzeige. Die Statusanzeige informiert dich über den Speichervorgang, Backups oder andere Systemmeldungen.
+
+Auf allen Seiten erscheint beim ersten Drücken der <kbd>Tab</kbd>-Taste ein versteckter Link „Zum Inhalt springen“, mit dem du direkt in den Hauptbereich springen kannst.
 
 **Hinweis zum Design:** Die Farbauswahl orientiert sich am mitgelieferten Mockup (LAYOUT.png). Das dunkle Standard‑Theme verwendet ein tiefblaues Grundlayout, helle Beschriftungen und farbige Akzentrahmen. Jedes Monatsmodul besitzt einen individuellen Farbrahmen und eine dezent getönte Überschrift – so lässt sich der Kalender auf einen Blick strukturieren. Du kannst jederzeit auf ein helles oder kontrastreiches Farbschema umschalten und die Akzentfarben variieren.
 
@@ -26,13 +28,14 @@ Am oberen Rand befindet sich ein fester **Kopfbereich** mit einem Navigations‑
    - **To‑Dos:** Aufgabenliste für diesen Tag. Neue Einträge fügst du mit „+ To‑Do“ hinzu, erledigte To‑Dos haken ab. Der Zähler (offen/erledigt) erscheint in der Tageskachel, und die Titel deiner To‑Dos werden direkt als Vorschau in der Tageskachel angezeigt, damit du geplante Aufgaben auf einen Blick erkennst.
 3. **Speichern:** Änderungen werden automatisch beim Verlassen des Eingabefeldes oder Schließen des Drawers gespeichert. Du kannst zusätzlich mit <kbd>S</kbd> eine manuelle Speicherung auslösen.
 4. **Markierungen:** Freie Tage sind rot hinterlegt, belegte Tage grün. Heute wird mit einem gelben Rahmen markiert. Der Zähler in der Ecke zeigt offene/erledigte To‑Dos.
-5. **Monate maximieren:** Über „Max“ vergrößerst du einen Monat. In der Profiversion wird der ausgewählte Monat allein angezeigt und belegt die gesamte Breite der Kalenderansicht; alle anderen Monate werden ausgeblendet, sodass du dich auf diesen Abschnitt konzentrieren kannst. Ein weiterer Klick auf „Max“ stellt die normale Ansicht wieder her. „Vollbild“ schaltet den Monat in einen eigenen Vollbildmodus; mit erneutem Klick oder der Taste <kbd>Esc</kbd> verlässt du ihn.
+5. **Monate maximieren:** Über „Max“ vergrößerst du einen Monat. In der Profiversion wird der ausgewählte Monat allein angezeigt und belegt die gesamte Breite der Kalenderansicht; alle anderen Monate werden ausgeblendet, sodass du dich auf diesen Abschnitt konzentrieren kannst. Ein weiterer Klick auf „Max“ stellt die normale Ansicht wieder her. „Vollbild“ schaltet den Monat in einen eigenen Vollbildmodus; mit erneutem Klick, der Taste <kbd>Esc</kbd> oder dem Tastenkürzel <kbd>Strg</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> verlässt du ihn. Unterstützt dein Browser die Vollbild‑Technik nicht, simuliert die Anwendung den Modus als Fallback und meldet dies in der Statuszeile.
 6. **Übersichten:** „Info“ öffnet eine tabellarische Monatsübersicht. Im Kopfbereich des Kalenders findest du Buttons für Jahres‑ und Monatsübersichten, PDF‑Druck und Text‑Export.
 
 ## 3 – Dashboard nutzen
 
 Das Dashboard im rechten Panel bietet folgende Informationen und Funktionen:
 
+* **Datum und Uhrzeit:** Oben zeigt eine Live-Uhr aktuelle Werte. Ein Klick oder <kbd>Enter</kbd> nach Fokus (Tab) kopiert die Anzeige in die Zwischenablage (Clipboard). Falls dein Browser das automatische Kopieren nicht unterstützt, wird der Text markiert, damit du ihn mit <kbd>Strg</kbd>+<kbd>C</kbd> kopieren kannst. Über den danebenstehenden Knopf „24 h/12 h" lässt sich das Zeitformat umstellen.
 * **Aktueller Monat:** Anzeige des Monatsnamens, Anzahl freier und belegter Tage sowie eine Legende für die Farbkennzeichnung.
 * **Offene Datumsangaben:** Liste aller freien Tage im aktuellen Monat. Mit einem Klick springst du direkt zum ausgewählten Tag im Kalender.
 * **Export:** Buttons zum Export der offenen Tage und des aktuellen Monats als Textdatei.
@@ -48,7 +51,7 @@ Im Bereich **Einstellungen** stehen dir folgende Optionen zur Verfügung:
 | Einstellung      | Beschreibung                                          |
 |-----------------|--------------------------------------------------------|
 | Jahr            | Wählt das Kalenderjahr aus (±3 Jahre um das aktuelle).|
-| Theme           | Drei Farbschemata: Hell, Dunkel und Kontrast.         |
+| Theme           | Drei Farbschemata: Hell, Dunkel und Kontrast. Beim ersten Start richtet sich die Auswahl nach deinem System (hell oder dunkel). |
 | Akzentfarbe     | Blau, Grün, Violett oder Rot. Beeinflusst Highlights. |
 | Textgröße       | Vier Skalierungen von 100 % bis 137 %.                 |
 | Daten löschen   | Setzt alle Einträge und Einstellungen zurück.         |
@@ -62,9 +65,14 @@ Die Einstellungen werden sofort angewandt und gespeichert. Sollte dein Browser k
 | <kbd>T</kbd> | Springt zum heutigen Datum und öffnet den Editor.        |
 | <kbd>F</kbd> | Springt zum nächsten freien Tag und öffnet den Editor.    |
 | <kbd>S</kbd> | Speichert den aktuellen Zustand manuell.                 |
+| <kbd>Strg</kbd>/<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> | Vollbild für den aktuellen Monat umschalten. |
+| <kbd>Strg</kbd>/<kbd>Cmd</kbd>+<kbd>Z</kbd> | Letzte Aktion rückgängig (Undo ↶). |
+| <kbd>Strg</kbd>/<kbd>Cmd</kbd>+<kbd>Y</kbd> | Rückgängig gemachte Aktion wiederholen (Redo ↷). |
 | <kbd>Esc</kbd> | Schließt geöffnete Dialoge (Drawer oder Übersicht).      |
 
 Die Tastenkürzel sind deaktiviert, solange du dich in einem Eingabefeld befindest, damit sie nicht versehentlich ausgelöst werden.
+
+Die Buttons ↶ Undo und ↷ Redo findest du im Bereich „Debug“. Sie sind grau, solange kein Verlauf vorhanden ist.
 
 ## 6 – Export und Import
 
@@ -81,8 +89,14 @@ Die Anwendung überprüft beim Laden automatisch den Zustand der gespeicherten D
 ## 8 – Barrierefreiheit und Benutzerfreundlichkeit
 
 * **Kontraste:** Alle Themes erfüllen die WCAG‑Kontrastkriterien. Buttons und interaktive Elemente besitzen gut sichtbare Fokusrahmen.
+* **Große Klickflächen:** Navigation und Buttons bieten mindestens 44 px hohe Tippflächen (Tap‑Targets), damit sie auch auf Touch‑Geräten leicht zu treffen sind.
 * **Schriftgrößen:** Wähle unter Einstellungen die für dich passende Textgröße. Große Tageszahlen erleichtern das Lesen.
 * **Responsive Design:** Auf kleineren Bildschirmen fährt die Navigationsleiste ein; das Info‑Panel wird ausgeblendet, um Platz zu sparen.
 * **Klar beschriftete Bereiche:** Jede Sektion verfügt über eine Überschrift, und Formulare sind mit Labels versehen. Tooltips erklären Funktionen.
+* **Reduzierte Bewegung:** Wenn dein System „Weniger Bewegung“ vorgibt, werden Animationen und Übergänge abgeschaltet.
 
 Wir wünschen dir viel Erfolg bei der Planung deiner Inhalte mit dem Jahrescontent‑Kalender!
+
+## 9 – Automatische Startroutine
+
+Mit `npm start` führst du eine Startroutine aus. Diese prüft die Node‑Version, installiert bei Bedarf fehlende Abhängigkeiten (Pakete) und startet anschließende Tests. Alle Schritte werden im Terminal beschrieben. Fehler werden abgefangen und automatisch repariert, soweit möglich.

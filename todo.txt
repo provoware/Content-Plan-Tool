@@ -1,4 +1,4 @@
-- [ ] Skip-Link in weiteren Seiten prüfen
+- [x] Skip-Link in weiteren Seiten prüfen
 - [x] Weitere Tooltips für Einstellungen ergänzen
 - [x] Kontrastwerte im Dark-Theme testen
 - [ ] Farbschema weiter an Vorlage anpassen
@@ -7,3 +7,23 @@
 - [ ] Kartenbarrierefreiheit überprüfen
 - [x] JSON-Manifeste für Standards, Erweiterungen und Anleitung hinzufügen
 - [ ] Hilfsfunktionen zentralisieren
+- [x] Projektstruktur bereinigen (Ordner und Pfad-Fallbacks)
+- [x] Print-CSS einbinden
+- [x] Fokus-Stile und Zielgrößen verbessern
+- [x] Undo/Redo-Grundlage anlegen
+- [x] Datum und Uhrzeit im Dashboard anzeigen
+- [x] Vollbildfunktion verbessern und testen
+- [x] Undo/Redo Buttons deaktivieren, wenn Verlauf leer
+- [x] Undo/Redo Tests ergänzen
+- [x] Uhr barrierefrei und kopierbar machen
+- [x] Kopierfunktion mit Fallback erweitern
+- [x] Option für andere Zeitformate (z.B. 12/24 h)
+- [x] Startroutine für automatische Einrichtung hinzufügen
+- [x] Tests für Startroutine ergänzen
+- [x] Tests für Clipboard-Fallback ergänzen
+ - [x] Tests für Vollbild-Shortcut ergänzen
+- [x] Tests für Vollbild-Fallback ergänzen
+- [x] Themes prüfen und ungültige Angaben auf „Hell“ setzen
+- [x] Fokusdarstellung und Zielgröße der Pillen verbessern
+- [x] Tests für Theme-Fallback ergänzen
+- [x] Tap-Größen im Debug-Bereich prüfen
