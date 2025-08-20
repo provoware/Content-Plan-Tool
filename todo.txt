@@ -27,3 +27,6 @@
 - [x] Fokusdarstellung und Zielgröße der Pillen verbessern
 - [x] Tests für Theme-Fallback ergänzen
 - [x] Tap-Größen im Debug-Bereich prüfen
+
+- [x] Codebasis analysieren und Tests laufen lassen
+- [ ] Release vorbereiten: Dokumentation finalisieren und Cross-Browser-Tests durchführen
