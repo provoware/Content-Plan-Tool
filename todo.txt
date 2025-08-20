@@ -1,4 +1,4 @@
-- [ ] Skip-Link in weiteren Seiten prüfen
+- [x] Skip-Link in weiteren Seiten prüfen
 - [x] Weitere Tooltips für Einstellungen ergänzen
 - [x] Kontrastwerte im Dark-Theme testen
 - [ ] Farbschema weiter an Vorlage anpassen
@@ -21,7 +21,7 @@
 - [x] Startroutine für automatische Einrichtung hinzufügen
 - [x] Tests für Startroutine ergänzen
 - [x] Tests für Clipboard-Fallback ergänzen
-- [ ] Tests für Vollbild-Shortcut ergänzen
+ - [x] Tests für Vollbild-Shortcut ergänzen
 - [x] Tests für Vollbild-Fallback ergänzen
 - [x] Themes prüfen und ungültige Angaben auf „Hell“ setzen
 - [x] Fokusdarstellung und Zielgröße der Pillen verbessern

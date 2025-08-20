@@ -1462,7 +1462,7 @@
       redo();
       return;
     }
-    if (mod && e.shiftKey && e.key.toLowerCase() === 'f') {
+    if (isFullscreenShortcut(e)) {
       e.preventDefault();
       const monthEl = currentFullscreen || (e.target.closest && e.target.closest('.month')) || document.querySelector('.month');
       if (monthEl) {

@@ -13,7 +13,7 @@ Die Oberfläche ist in drei Spalten unterteilt:
 
 Am oberen Rand befindet sich ein fester **Kopfbereich** mit einem Navigations‑Toggle (nur auf kleinen Bildschirmen sichtbar), dem Titel der Anwendung und einer Statusanzeige. Die Statusanzeige informiert dich über den Speichervorgang, Backups oder andere Systemmeldungen.
 
-Beim ersten Drücken der <kbd>Tab</kbd>-Taste erscheint ein versteckter Link „Zum Inhalt springen“, mit dem du direkt in den Hauptbereich springen kannst.
+Auf allen Seiten erscheint beim ersten Drücken der <kbd>Tab</kbd>-Taste ein versteckter Link „Zum Inhalt springen“, mit dem du direkt in den Hauptbereich springen kannst.
 
 **Hinweis zum Design:** Die Farbauswahl orientiert sich am mitgelieferten Mockup (LAYOUT.png). Das dunkle Standard‑Theme verwendet ein tiefblaues Grundlayout, helle Beschriftungen und farbige Akzentrahmen. Jedes Monatsmodul besitzt einen individuellen Farbrahmen und eine dezent getönte Überschrift – so lässt sich der Kalender auf einen Blick strukturieren. Du kannst jederzeit auf ein helles oder kontrastreiches Farbschema umschalten und die Akzentfarben variieren.
 
