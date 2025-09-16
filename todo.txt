@@ -3,10 +3,10 @@
 - [x] Kontrastwerte im Dark-Theme testen
 - [x] Farbschema weiter an Vorlage anpassen
 - [x] Module als Kartenlayout darstellen
-- [ ] Weitere Tests für Kalenderfunktionen ergänzen
-- [ ] Kartenbarrierefreiheit überprüfen
+- [x] Weitere Tests für Kalenderfunktionen ergänzen
+- [x] Kartenbarrierefreiheit überprüfen
 - [x] JSON-Manifeste für Standards, Erweiterungen und Anleitung hinzufügen
-- [ ] Hilfsfunktionen zentralisieren
+- [x] Hilfsfunktionen zentralisieren
 - [x] Projektstruktur bereinigen (Ordner und Pfad-Fallbacks)
 - [x] Print-CSS einbinden
 - [x] Fokus-Stile und Zielgrößen verbessern

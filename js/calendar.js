@@ -2,17 +2,25 @@
 import {applyTheme} from './theme.js';
 import {validateEvents} from './validate.js';
 
+const logic = (typeof globalThis !== 'undefined' && globalThis.CalendarLogic) || {};
+const {
+  formatMonth,
+  daysInMonth,
+  weekday,
+  ymd,
+  addDays,
+  matchFilters,
+  expandRangesAndRecurrence,
+  parseCSV,
+  toEvents
+} = logic;
+
+if (typeof formatMonth !== 'function' || typeof expandRangesAndRecurrence !== 'function') {
+  throw new Error('CalendarLogic nicht geladen – bitte calendar-logic.js einbinden.');
+}
+
 const qs = s=>document.querySelector(s);
 const qsa = s=>Array.from(document.querySelectorAll(s));
-
-function formatMonth(year, month){
-  const d = new Date(year, month, 1);
-  return d.toLocaleString('de-DE', {month:'long', year:'numeric'});
-}
-function daysInMonth(year, month){ return new Date(year, month+1, 0).getDate(); }
-function weekday(deDate){ const w = deDate.getDay(); return (w+6)%7; } // 0=Mon..6=Son
-function ymd(d){ return d.toISOString().slice(0,10); }
-function addDays(date, n){ const d = new Date(date); d.setDate(d.getDate()+n); return d; }
 
 async function loadEvents(){
   try { return await fetch('data/events.json', {cache:'no-store'}).then(r=>r.json()); }
@@ -21,137 +29,6 @@ async function loadEvents(){
 async function loadSchema(){
   try{ return await fetch('config/events.schema.json', {cache:'no-store'}).then(r=>r.json()); }
   catch(e){ return null; }
-}
-
-function matchFilters(ev, filters){
-  if(filters.status.size && !filters.status.has(ev.status)) return false;
-  if(filters.platform.size && (!ev.platform || !filters.platform.has(ev.platform))) return false;
-  if(filters.tag.size){
-    if(!Array.isArray(ev.tags) || !ev.tags.some(t=>filters.tag.has(t))) return false;
-  }
-  return true;
-}
-
-function expandRangesAndRecurrence(events, year, month){
-  // Build concrete instances in visible month
-  const first = new Date(year, month, 1);
-  const last = new Date(year, month, daysInMonth(year, month));
-  const results = [];
-  const inMonth = (d)=> d>=first && d<=last;
-
-  // Parse simple RRULE if provided
-  const parseRRULE = (s)=>{
-    const out = {};
-    s.split(';').forEach(pair=>{
-      const [k,v] = pair.split('=');
-      if(!k || !v) return;
-      out[k.toUpperCase()] = v.toUpperCase();
-    });
-    return out;
-  };
-
-  const wd = ['MO','TU','WE','TH','FR','SA','SU'];
-
-  events.forEach(ev=>{
-    // Choose base dates
-    let baseStart = ev.start_date || ev.date;
-    let baseEnd = ev.end_date || ev.date;
-    if(!baseStart) return;
-
-    // Recurrence handling
-    const rec = ev.recurrence || {};
-    let instances = [];
-
-    // Helper push instance within month range
-    const pushIfInMonth = (d)=>{
-      if(inMonth(d)){
-        const inst = {...ev, date: ymd(d)};
-        delete inst.start_date; delete inst.end_date;
-        results.push(inst);
-      }
-    };
-
-    if(rec.rrule || rec.freq){
-      // derive rule
-      let FREQ, INTERVAL= (rec.interval || 1), BYDAY=null, COUNT=null, UNTIL=null;
-      if(rec.rrule){
-        const rr = parseRRULE(rec.rrule);
-        FREQ = rr.FREQ;
-        if(rr.INTERVAL) INTERVAL = parseInt(rr.INTERVAL,10)||1;
-        if(rr.BYDAY) BYDAY = rr.BYDAY.split(',');
-        if(rr.COUNT) COUNT = parseInt(rr.COUNT,10)||null;
-        if(rr.UNTIL) UNTIL = rr.UNTIL;
-      } else {
-        FREQ = (rec.freq||'MONTHLY').toUpperCase();
-        BYDAY = rec.byweekday || null;
-        COUNT = rec.count || null;
-        UNTIL = rec.until || null;
-      }
-      const start = new Date(baseStart);
-      const limit = UNTIL ? new Date(UNTIL) : addDays(last, 31); // extend a bit beyond month
-      let n = 0;
-      const addInstance = (d)=>{
-        if(inMonth(d)) pushIfInMonth(d);
-        n++; if(COUNT && n>=COUNT) return true;
-        return false;
-      };
-      let cur = new Date(start);
-      if(FREQ==='DAILY'){
-        while(cur<=limit){
-          if(addInstance(cur)) break;
-          cur = addDays(cur, INTERVAL);
-        }
-      } else if(FREQ==='WEEKLY'){
-        // if BYDAY set, snap to that weekday set each week
-        const weekStart = new Date(first); // iterate weeks covering month
-        for(let w=addDays(weekStart,-7); w<=addDays(last,7); w=addDays(w,7)){
-          if(BYDAY && BYDAY.length){
-            BYDAY.forEach(code=>{
-              const idx = wd.indexOf(code);
-              if(idx<0) return;
-              const d = addDays(w, idx);
-              if(d>=start && d<=limit){
-                if(addInstance(d)) return;
-              }
-            });
-          } else {
-            const d = new Date(cur);
-            if(d>=start && d<=limit) if(addInstance(d)) break;
-            cur = addDays(cur, 7*INTERVAL);
-          }
-        }
-      } else if(FREQ==='MONTHLY'){
-        // same day of month
-        let d = new Date(start);
-        while(d<=limit){
-          if(addInstance(d)) break;
-          d = new Date(d.getFullYear(), d.getMonth()+INTERVAL, d.getDate());
-        }
-      } else if(FREQ==='YEARLY'){
-        let d = new Date(start);
-        while(d<=limit){
-          if(addInstance(d)) break;
-          d = new Date(d.getFullYear()+INTERVAL, d.getMonth(), d.getDate());
-        }
-      }
-    } else {
-      // No recurrence: expand range
-      const s = new Date(baseStart);
-      const e = new Date(baseEnd);
-      for(let d=new Date(s); d<=e; d=addDays(d,1)){
-        pushIfInMonth(d);
-      }
-    }
-
-    // Deadline marker (separat, optional)
-    if(ev.deadline){
-      const dd = new Date(ev.deadline);
-      if(inMonth(dd)){
-        results.push({...ev, date: ymd(dd), status: ev.status || 'planned', _deadline:true});
-      }
-    }
-  });
-  return results;
 }
 
 function renderSummary(instances){
@@ -267,60 +144,6 @@ function bindShortcuts(){
 }
 
 /* --- CSV Importer --- */
-function parseCSV(text){
-  const rows = [];
-  let i=0, field='', row=[], inQuotes=false;
-  while(i<text.length){
-    const c = text[i];
-    if(inQuotes){
-      if(c==='"' && text[i+1]==='"'){ field+='"'; i+=2; continue; }
-      if(c==='"'){ inQuotes=false; i++; continue; }
-      field+=c; i++; continue;
-    } else {
-      if(c==='"'){ inQuotes=true; i++; continue; }
-      if(c===','){ row.push(field); field=''; i++; continue; }
-      if(c==='
-' || c==='
-'){
-        // handle CRLF
-        if(c==='\r' && text[i+1]==='\n') i++;
-        row.push(field); rows.push(row); field=''; row=[]; i++; continue;
-      }
-      field+=c; i++; continue;
-    }
-  }
-  if(field.length || row.length) { row.push(field); rows.push(row); }
-  return rows.filter(r=>r.length && r.some(v=>v.trim().length));
-}
-function toEvents(rows){
-  const head = rows[0].map(h=>h.trim().toLowerCase());
-  const idx = (k)=> head.indexOf(k);
-  const out=[];
-  for(let r=1;r<rows.length;r++){
-    const row = rows[r];
-    const g = (k)=> idx(k)>=0? (row[idx(k)]||'').trim() : '';
-    const ev = {
-      id: g('id') || `csv_${r}_${Date.now()}`,
-      title: g('title'),
-      date: g('date'),
-      status: g('status') || 'planned',
-    };
-    const sd = g('start_date'); const ed = g('end_date'); const dl = g('deadline');
-    if(sd) ev.start_date=sd; if(ed) ev.end_date=ed; if(dl) ev.deadline=dl;
-    const plat = g('platform'); if(plat) ev.platform=plat;
-    const tags = g('tags'); if(tags) ev.tags = tags.split(';').map(s=>s.trim()).filter(Boolean);
-    const rrule = g('rrule'); if(rrule) ev.recurrence = { rrule };
-    const freq = g('freq'); const interval = g('interval'); const byday=g('byweekday');
-    if(freq || interval || byday){
-      ev.recurrence = ev.recurrence || {};
-      if(freq) ev.recurrence.freq = freq.toUpperCase();
-      if(interval) ev.recurrence.interval = parseInt(interval,10)||1;
-      if(byday) ev.recurrence.byweekday = byday.split('|').map(s=>s.trim().toUpperCase()).filter(Boolean);
-    }
-    out.push(ev);
-  }
-  return out;
-}
 function downloadJSON(filename, data){
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
   const a = document.createElement('a');

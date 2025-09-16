@@ -13,9 +13,10 @@
 (function() {
   'use strict';
   /* Hilfsfunktionen */
-  const $ = (sel, ctx=document) => ctx.querySelector(sel);
-  const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
-  const byId = id => document.getElementById(id);
+  const helperSource = (typeof globalThis !== 'undefined' && globalThis.HelperUtil) || {};
+  const $ = helperSource.$ || ((sel, ctx = document) => (ctx || document).querySelector(sel));
+  const $$ = helperSource.$$ || ((sel, ctx = document) => Array.from((ctx || document).querySelectorAll(sel)));
+  const byId = helperSource.byId || (id => (typeof document !== 'undefined' ? document.getElementById(id) : null));
   const fmt2 = n => String(n).padStart(2, '0');
   const today = new Date();
   const MONTHS = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
@@ -53,29 +54,53 @@
   // ID des Autosave‑Intervalls (wird bei Aktivierung gesetzt)
   let autosaveInterval = null;
 
-  /* Speicher‑Wrapper mit Fallback */
-  const memStore = {};
-  function safeGet(key) {
+  /* Speicher‑Wrapper mit Fallback (zentralisiert in helper-util) */
+  const rawSafeGet = helperSource.safeGet || (key => {
     try {
-      return localStorage.getItem(key);
+      return typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null;
     } catch (err) {
-      return memStore[key] || null;
+      return null;
     }
-  }
-  function safeSet(key, value) {
+  });
+  const rawSafeSet = helperSource.safeSet || ((key, value, options = {}) => {
+    if (typeof localStorage === 'undefined') {
+      if (options.onFallback) options.onFallback(new Error('localStorage unavailable'));
+      return false;
+    }
     try {
       localStorage.setItem(key, value);
+      return true;
     } catch (err) {
-      memStore[key] = value;
-      updateStatus('Speichern im lokalen Speicher fehlgeschlagen, Fallback genutzt');
-      console.warn('localStorage set failed', err);
+      if (options.onFallback) options.onFallback(err);
+      return false;
     }
-  }
-  function safeRemove(key) {
+  });
+  const rawSafeRemove = helperSource.safeRemove || (key => {
+    if (typeof localStorage === 'undefined') return false;
     try {
       localStorage.removeItem(key);
+      return true;
     } catch (err) {
-      delete memStore[key];
+      return false;
+    }
+  });
+
+  function safeGet(key) {
+    return rawSafeGet(key);
+  }
+
+  function safeSet(key, value) {
+    return rawSafeSet(key, value, { onFallback: storageFallback });
+  }
+
+  function safeRemove(key) {
+    return rawSafeRemove(key);
+  }
+
+  function storageFallback(err) {
+    updateStatus('Speichern im lokalen Speicher fehlgeschlagen, Fallback genutzt');
+    if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+      console.warn('localStorage set failed', err);
     }
   }
 
@@ -633,6 +658,10 @@
       const monthEl = document.createElement('section');
       monthEl.className = 'month';
       monthEl.setAttribute('data-month', m);
+      monthEl.setAttribute('role', 'region');
+      monthEl.setAttribute('aria-label', `${MONTHS[m]} ${state.year}`);
+      const headerId = `month-${state.year}-${m}`;
+      monthEl.setAttribute('aria-labelledby', headerId);
       // Weisen Sie jedem Monat eine individuelle Akzentfarbe zu. Die
       // Akzentfarbe wird sowohl als Rahmenfarbe als auch als
       // Schatten verwendet, um die optische Nähe zum Layout
@@ -650,6 +679,7 @@
       // Header
       const header = document.createElement('div');
       header.className = 'month-header';
+      header.setAttribute('id', headerId);
       header.innerHTML = `
         <div class="month-name">${MONTHS[m]} ${state.year}</div>
         <div class="month-stats" id="stats-${m}">—</div>
@@ -686,8 +716,18 @@
         const used = isUsed(item);
         const isToday = (state.year === today.getFullYear() && m === today.getMonth() && d === today.getDate());
         const day = document.createElement('div');
+        const todos = (item?.todos || []);
+        const openTodos = todos.filter(t => !t.done).length;
+        const doneTodos = todos.filter(t => t.done).length;
         day.className = 'day ' + (used ? 'used' : 'free') + (isToday ? ' today' : '');
         day.setAttribute('data-ymd', ymd);
+        day.setAttribute('role', 'gridcell');
+        day.setAttribute('tabindex', '0');
+        const ariaBits = [`${d}. ${MONTHS[m]} ${state.year}`, used ? 'belegt' : 'frei'];
+        if (isToday) ariaBits.push('Heute');
+        if (openTodos) ariaBits.push(`${openTodos} offene To-dos`);
+        if (doneTodos && !openTodos) ariaBits.push('alle To-dos erledigt');
+        day.setAttribute('aria-label', ariaBits.join(' · '));
         // Kopfzeile
         const headerEl = document.createElement('div');
         headerEl.className = 'day-header';
@@ -704,9 +744,6 @@
           stateEl.appendChild(b);
         }
         // To‑Do Badge
-        const todos = (item?.todos || []);
-        const openTodos = todos.filter(t => !t.done).length;
-        const doneTodos = todos.filter(t => t.done).length;
         if (openTodos || doneTodos) {
           const b = document.createElement('span');
           b.className = 'badge todos';
@@ -766,6 +803,13 @@
           // Nicht öffnen, wenn im Eingabefeld geklickt
           if (ev.target instanceof HTMLInputElement || ev.target instanceof HTMLTextAreaElement) return;
           openDrawer(ymd);
+        });
+        day.addEventListener('keydown', ev => {
+          if (ev.key === 'Enter' || ev.key === ' ') {
+            if (ev.target instanceof HTMLInputElement || ev.target instanceof HTMLTextAreaElement) return;
+            ev.preventDefault();
+            openDrawer(ymd);
+          }
         });
         // Inline Titel bearbeiten
         ti.addEventListener('input', e => {
@@ -1419,15 +1463,62 @@
     box.innerHTML = '';
     if (!list || list.length === 0) {
       const p = document.createElement('div');
+      p.className = 'debug-entry ok';
       p.textContent = 'Keine Probleme gefunden.';
       box.appendChild(p);
       return;
     }
     list.forEach(l => {
       const div = document.createElement('div');
+      const cls = /in Ordnung|fertig/i.test(l) ? 'ok' : 'warn';
+      div.className = `debug-entry ${cls}`;
       div.textContent = l;
       box.appendChild(div);
     });
+  }
+
+  function checkCalendarAccessibility() {
+    const results = [];
+    const months = $$('.month');
+    if (!months.length) {
+      results.push('Kalender noch nicht gerendert – bitte Kalenderbereich öffnen.');
+      return results;
+    }
+    const missingRole = months.filter(m => m.getAttribute('role') !== 'region');
+    if (missingRole.length) {
+      results.push(`${missingRole.length} Monatskarten ohne Rolle „region“.`);
+    }
+    const missingLabel = months.filter(m => !m.getAttribute('aria-label') && !m.getAttribute('aria-labelledby'));
+    if (missingLabel.length) {
+      results.push(`${missingLabel.length} Monatskarten ohne zugängliche Beschriftung.`);
+    }
+    let missingFocus = 0;
+    let missingAria = 0;
+    let sampleFocus = '';
+    let sampleAria = '';
+    months.forEach(month => {
+      month.querySelectorAll('.day').forEach(day => {
+        if (!day.hasAttribute('tabindex')) {
+          missingFocus++;
+          if (!sampleFocus) sampleFocus = day.getAttribute('data-ymd') || 'unbekannt';
+        }
+        const ariaLabel = day.getAttribute('aria-label');
+        if (!ariaLabel || ariaLabel.trim().length < 5) {
+          missingAria++;
+          if (!sampleAria) sampleAria = day.getAttribute('data-ymd') || 'unbekannt';
+        }
+      });
+    });
+    if (missingFocus) {
+      results.push(`Tastatur: ${missingFocus} Tage ohne Fokus (erstes Beispiel ${sampleFocus}).`);
+    }
+    if (missingAria) {
+      results.push(`Beschriftung: ${missingAria} Tage ohne verständliches aria-label (erstes Beispiel ${sampleAria}).`);
+    }
+    if (!results.length) {
+      results.push('Kalenderkarten: Rollen, Beschriftungen und Tastaturzugriff sind in Ordnung.');
+    }
+    return results;
   }
 
   /* Autosave Steuerung */
@@ -1470,6 +1561,16 @@
       renderLog();
       renderDebugStatus();
       showDebugResults(issues);
+    });
+    const cardsBtn = byId('check-cards-btn');
+    if (cardsBtn) cardsBtn.addEventListener('click', () => {
+      const report = checkCalendarAccessibility();
+      showDebugResults(report);
+      logEvent('Karten-Check ausgeführt');
+      renderLog();
+      updateStatus(report.length === 1 && /in Ordnung/.test(report[0])
+        ? 'Karten-Check: alles in Ordnung'
+        : 'Karten-Check abgeschlossen');
     });
     // Export log button
     const exportBtn = byId('export-log');

@@ -883,6 +883,14 @@ kbd + kbd {
   transform: translateY(-2px);
   box-shadow: var(--shadow-sm);
 }
+.day:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: var(--shadow-md);
+}
+.day:focus:not(:focus-visible) {
+  outline: none;
+}
 .day-header {
   display: flex;
   align-items: center;
@@ -1241,6 +1249,26 @@ tr:hover {
   font-size: var(--fs-sm);
   color: var(--text);
   background: var(--panel);
+}
+.debug-entry {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .35rem .45rem;
+  border-radius: calc(var(--radius) - 6px);
+  margin-bottom: .35rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-left: 3px solid var(--border);
+}
+.debug-entry.warn {
+  border-left-color: var(--warn);
+}
+.debug-entry.ok {
+  border-left-color: var(--ok);
+  background: rgba(22, 163, 74, 0.12);
+}
+.debug-entry:last-child {
+  margin-bottom: 0;
 }
 
 /* Buttons */

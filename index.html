@@ -178,13 +178,14 @@
         <div class="debug-content">
           <p id="debug-storage">Speicher: —</p>
           <p id="debug-size">Zustandsgröße: —</p>
-          <div class="debug-actions">
-            <button id="run-selfcheck" type="button" class="secondary" title="Umgebung prüfen und reparieren">Self‑Check &amp; Reparieren</button>
-            <button id="export-log" type="button" class="secondary" title="Protokoll als Datei speichern">Log exportieren</button>
-            <button id="clear-storage-btn" type="button" class="warn" title="Alle gespeicherten Daten löschen">Speicher zurücksetzen</button>
-            <button id="autosave-toggle" type="button" class="secondary" title="Automatisches Speichern umschalten">Autosave deaktivieren</button>
-            <button id="undo-btn" type="button" class="secondary" title="Letzte Aktion rückgängig machen (Strg/Cmd+Z)" disabled aria-disabled="true">↶ Undo</button>
-            <button id="redo-btn" type="button" class="secondary" title="Rückgängig gemachte Aktion wiederholen (Strg/Cmd+Y)" disabled aria-disabled="true">↷ Redo</button>
+        <div class="debug-actions">
+          <button id="run-selfcheck" type="button" class="secondary" title="Umgebung prüfen und reparieren">Self‑Check &amp; Reparieren</button>
+          <button id="check-cards-btn" type="button" class="secondary" title="Kalenderkarten auf Zugänglichkeit prüfen">Karten‑Check</button>
+          <button id="export-log" type="button" class="secondary" title="Protokoll als Datei speichern">Log exportieren</button>
+          <button id="clear-storage-btn" type="button" class="warn" title="Alle gespeicherten Daten löschen">Speicher zurücksetzen</button>
+          <button id="autosave-toggle" type="button" class="secondary" title="Automatisches Speichern umschalten">Autosave deaktivieren</button>
+          <button id="undo-btn" type="button" class="secondary" title="Letzte Aktion rückgängig machen (Strg/Cmd+Z)" disabled aria-disabled="true">↶ Undo</button>
+          <button id="redo-btn" type="button" class="secondary" title="Rückgängig gemachte Aktion wiederholen (Strg/Cmd+Y)" disabled aria-disabled="true">↷ Redo</button>
           </div>
           <div id="debug-results" class="list"></div>
         </div>
@@ -251,6 +252,7 @@
       <div class="modal-content" id="modal-content"></div>
     </div>
   </section>
+  <script src="js/helper-util.js" onerror="this.src='helper-util.js'"></script>
   <script src="js/history.js" onerror="this.src='history.js'"></script>
   <script src="js/colors.js" onerror="this.src='colors.js'"></script>
   <script src="js/time.js" onerror="this.src='time.js'"></script>

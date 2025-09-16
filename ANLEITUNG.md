@@ -7,7 +7,7 @@ Dieses Dokument erläutert die Verwendung des **Jahrescontent‑Kalenders** Schr
 Die Oberfläche ist in drei Spalten unterteilt:
 
 1. **Navigationsleiste (links)** – Über die Schaltflächen gelangst du zu den Bereichen **Kalender**, **Einstellungen** und **Hilfe**. Unten findest du Buttons für **Backup** (JSON‑Export) und **Abmelden** (Daten zurücksetzen).
-   Zusätzlich gibt es einen Bereich **Debug**. In diesem Diagnosebereich kannst du den Zustand überprüfen (Self‑Check), das Ereignislog exportieren, den Speicher zurücksetzen und das automatische Backup ein‑ oder ausschalten. Die großen Schaltflächen besitzen erklärende Hinweise, die beim Überfahren erscheinen (Tooltips).
+   Zusätzlich gibt es einen Bereich **Debug**. In diesem Diagnosebereich kannst du den Zustand überprüfen (Self‑Check), das Ereignislog exportieren, den Speicher zurücksetzen und das automatische Backup ein‑ oder ausschalten. Ein neuer Button „Karten‑Check“ prüft die Monatskarten auf Zugänglichkeit (Rollen, Beschriftungen, Tastaturfokus) und zeigt das Ergebnis im Protokoll an. Die großen Schaltflächen besitzen erklärende Hinweise, die beim Überfahren erscheinen (Tooltips).
 2. **Arbeitsbereich (Mitte)** – Hier wird je nach Auswahl der entsprechende Inhalt angezeigt. Standardmäßig ist der Kalender aktiv.
 3. **Info‑Panel (rechts)** – Dieses Panel zeigt das Dashboard mit Statistiken zum aktuellen Monat, eine Liste offener Tage, anstehende To‑Dos, deine persönlichen Notizen, das Ereignislog und eine kleine Tippsektion.
 
@@ -95,6 +95,8 @@ Die Anwendung überprüft beim Laden automatisch den Zustand der gespeicherten D
 * **Responsive Design:** Auf kleineren Bildschirmen fährt die Navigationsleiste ein; das Info‑Panel wird ausgeblendet, um Platz zu sparen.
 * **Klar beschriftete Bereiche:** Jede Sektion verfügt über eine Überschrift, und Formulare sind mit Labels versehen. Tooltips erklären Funktionen.
 * **Reduzierte Bewegung:** Wenn dein System „Weniger Bewegung“ vorgibt, werden Animationen und Übergänge abgeschaltet.
+* **Kalender per Tastatur:** Jede Tageskachel lässt sich nun direkt fokussieren; mit <kbd>Enter</kbd> oder <kbd>Leertaste</kbd> öffnest du den Editor auch ohne Maus.
+* **A11y‑Check:** Der Debug‑Button „Karten‑Check“ meldet, ob Monatskarten und Tageskacheln mit Rollen, Labels und Fokus erreichbar sind.
 
 Wir wünschen dir viel Erfolg bei der Planung deiner Inhalte mit dem Jahrescontent‑Kalender!
 
