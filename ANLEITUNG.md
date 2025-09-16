@@ -29,7 +29,7 @@ Auf allen Seiten erscheint beim ersten Drücken der <kbd>Tab</kbd>-Taste ein ver
 3. **Speichern:** Änderungen werden automatisch beim Verlassen des Eingabefeldes oder Schließen des Drawers gespeichert. Du kannst zusätzlich mit <kbd>S</kbd> eine manuelle Speicherung auslösen.
 4. **Markierungen:** Freie Tage sind rot hinterlegt, belegte Tage grün. Heute wird mit einem gelben Rahmen markiert. Der Zähler in der Ecke zeigt offene/erledigte To‑Dos.
 5. **Monate maximieren:** Über „Max“ vergrößerst du einen Monat. In der Profiversion wird der ausgewählte Monat allein angezeigt und belegt die gesamte Breite der Kalenderansicht; alle anderen Monate werden ausgeblendet, sodass du dich auf diesen Abschnitt konzentrieren kannst. Ein weiterer Klick auf „Max“ stellt die normale Ansicht wieder her. „Vollbild“ schaltet den Monat in einen eigenen Vollbildmodus; mit erneutem Klick, der Taste <kbd>Esc</kbd> oder dem Tastenkürzel <kbd>Strg</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> verlässt du ihn. Unterstützt dein Browser die Vollbild‑Technik nicht, simuliert die Anwendung den Modus als Fallback und meldet dies in der Statuszeile.
-6. **Übersichten:** „Info“ öffnet eine tabellarische Monatsübersicht. Im Kopfbereich des Kalenders findest du Buttons für Jahres‑ und Monatsübersichten, PDF‑Druck und Text‑Export.
+6. **Schnellaktionen & Übersichten:** Oberhalb des Kalenders findest du die Schnellaktionen „Heute“, „Freier Tag“, „Monatsübersicht“, „Jahresübersicht“ sowie den TXT‑Export für freie Tage. Der Hinweisblock darunter erklärt zusätzlich die Tastenkürzel <kbd>T</kbd> (Heute) und <kbd>F</kbd> (Freier Tag); du kannst ihn über „Tipp ausblenden“ schließen. In der Hilfe steht ein Button „Kalender‑Tipp anzeigen“, der den Hinweis erneut aktiviert. Die Schaltflächen „Info“, „PDF“ oder „TXT“ in den Monatsköpfen öffnen weiterhin tabellarische Übersichten und Exporte.
 
 ## 3 – Dashboard nutzen
 
@@ -54,6 +54,7 @@ Im Bereich **Einstellungen** stehen dir folgende Optionen zur Verfügung:
 | Theme           | Drei Farbschemata: Hell, Dunkel und Kontrast. Beim ersten Start richtet sich die Auswahl nach deinem System (hell oder dunkel). |
 | Akzentfarbe     | Blau, Grün, Violett oder Rot. Beeinflusst Highlights. |
 | Textgröße       | Vier Skalierungen von 100 % bis 137 %.                 |
+| Live‑Vorschau   | Zeigt ein Kartenbeispiel mit Buttons, Pillen und Textgröße, damit du Theme, Akzentfarbe und Schriftwirkung sofort beurteilen kannst. |
 | Daten löschen   | Setzt alle Einträge und Einstellungen zurück.         |
 
 Die Einstellungen werden sofort angewandt und gespeichert. Sollte dein Browser keinen Zugriff auf `localStorage` erlauben (z. B. im privaten Modus), greift ein In‑Memory‑Fallback; die Daten gehen dann jedoch beim Schließen des Fensters verloren.

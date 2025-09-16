@@ -58,6 +58,16 @@
               <button type="button" id="quick-year-overview" class="secondary small" title="Jahresübersicht anzeigen">Jahresübersicht</button>
             </div>
           </div>
+          <div class="section-hint" id="calendar-tip" role="note" aria-live="polite" tabindex="-1">
+            <div class="hint-icon" aria-hidden="true">💡</div>
+            <div class="hint-body">
+              <p class="hint-title">Schnellstart‑Tipp</p>
+              <p class="hint-text">Nutze die Schnellaktionen, um wichtige Ansichten sofort zu öffnen – oder drücke <kbd>T</kbd> für heute und <kbd>F</kbd> für den nächsten freien Tag.</p>
+              <div class="hint-actions">
+                <button type="button" class="link-btn" id="dismiss-calendar-tip">Tipp ausblenden</button>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="calendar-wrapper">
           <!-- Der Kalender selbst wird vom Skript in #calendar erzeugt -->
@@ -148,10 +158,15 @@
           <ul>
             <li>Navigiere mithilfe der Seitenleiste zu den einzelnen Bereichen: <strong>Kalender</strong>, <strong>Einstellungen</strong> und <strong>Hilfe</strong>.</li>
             <li>Im <strong>Kalender</strong> kannst du durch Klick auf einen Tag Details eingeben: Titel, zusätzliche Titel, Beschreibungen, Tags und To‑Dos. Änderungen werden automatisch gespeichert.</li>
+            <li>Die Schnellaktionen oberhalb des Kalenders springen zu heute, zum nächsten freien Tag oder öffnen Übersichten. Die Tastenkürzel <kbd>T</kbd> und <kbd>F</kbd> bieten denselben Komfort über die Tastatur.</li>
             <li>Unter <strong>Einstellungen</strong> kannst du das Jahr, die Darstellung (Theme), die Akzentfarbe und die Textgröße festlegen. Diese Einstellungen werden gespeichert.</li>
             <li>Nutze Tastenkürzel: <kbd>T</kbd> springt zu heute, <kbd>F</kbd> zum nächsten freien Tag, <kbd>S</kbd> speichert manuell, <kbd>Esc</kbd> schließt Dialoge, <kbd>Strg</kbd>/<kbd>Cmd</kbd>+<kbd>Z</kbd> macht rückgängig, <kbd>Strg</kbd>/<kbd>Cmd</kbd>+<kbd>Y</kbd> wiederholt.</li>
             <li>Über den Bereich <strong>Backup</strong> in der Seitenleiste kannst du deine Daten als JSON exportieren. Zusätzlich speichert das System automatisch alle fünf Minuten ein Backup ab.</li>
           </ul>
+          <div class="help-actions">
+            <button type="button" id="restore-calendar-tip" class="secondary small">Kalender‑Tipp anzeigen</button>
+            <p class="muted">Der Tipp erklärt Schnellaktionen und Tastenkürzel direkt im Kalender. Der Button aktiviert ihn erneut, falls er ausgeblendet wurde.</p>
+          </div>
           <p>Weitere Erläuterungen findest du in der beiliegenden Anleitung (ANLEITUNG.md).</p>
         </div>
       </section>

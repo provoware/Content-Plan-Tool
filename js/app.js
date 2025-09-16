@@ -24,6 +24,7 @@
   const THEME_KEY = 'provoware_theme';
   const FS_KEY = 'provoware_fs';
   const PALETTE_KEY = 'provoware_palette';
+  const TIP_KEY = 'provoware_tip_calendar';
   const TIMEFMT_KEY = 'provoware_timefmt';
 
   /* Farben für Monatsrahmen und Überschriften. Diese Liste wird
@@ -333,6 +334,49 @@
     quickSel.value = String(defaultMonth);
   }
 
+  function initCalendarTip() {
+    const tip = byId('calendar-tip');
+    if (!tip) return;
+    const dismissBtn = byId('dismiss-calendar-tip');
+    const restoreBtn = byId('restore-calendar-tip');
+    const wasHidden = safeGet(TIP_KEY) === 'hidden';
+    tip.hidden = wasHidden;
+    if (restoreBtn) {
+      restoreBtn.disabled = !wasHidden;
+      restoreBtn.setAttribute('aria-pressed', wasHidden ? 'false' : 'true');
+    }
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', () => {
+        tip.hidden = true;
+        safeSet(TIP_KEY, 'hidden');
+        if (restoreBtn) {
+          restoreBtn.disabled = false;
+          restoreBtn.setAttribute('aria-pressed', 'false');
+          restoreBtn.focus();
+        }
+        updateStatus('Kalender-Tipp ausgeblendet');
+      });
+    }
+    if (restoreBtn) {
+      restoreBtn.addEventListener('click', () => {
+        tip.hidden = false;
+        tip.classList.add('hint-pop');
+        safeRemove(TIP_KEY);
+        restoreBtn.disabled = true;
+        restoreBtn.setAttribute('aria-pressed', 'true');
+        setTimeout(() => tip.classList.remove('hint-pop'), 500);
+        requestAnimationFrame(() => {
+          try {
+            tip.focus({ preventScroll: true });
+          } catch (err) {
+            tip.focus();
+          }
+        });
+        updateStatus('Kalender-Tipp eingeblendet');
+      });
+    }
+  }
+
   /* Initialisierung der UI */
   function initUI() {
     // Navigation: show/hide modules
@@ -436,6 +480,7 @@
         updateStatus(`Jahresübersicht geöffnet: ${state.year}`);
       });
     }
+    initCalendarTip();
     // Settings form: will be populated via buildSelectors() and applyTheme
 
     // Debugging‑initialisierung wird separat über initDebug() durchgeführt

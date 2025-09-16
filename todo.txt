@@ -32,6 +32,6 @@
 - [ ] Release vorbereiten: Dokumentation finalisieren und Cross-Browser-Tests durchführen
 - [ ] Live-Vorschau mit Nutzerfeedback testen
 - [x] Mobile Darstellung der modernisierten Karten prüfen
-- [ ] README um Live-Vorschau ergänzen
-- [ ] Schnellaktionen dokumentieren (README & Anleitung)
+- [x] README um Live-Vorschau ergänzen
+- [x] Schnellaktionen dokumentieren (README & Anleitung)
 - [ ] Schnellaktionen mit UI-Tests absichern
