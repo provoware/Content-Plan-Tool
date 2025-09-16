@@ -277,11 +277,13 @@
     document.documentElement.setAttribute('data-theme', val);
     state.theme = val;
     safeSet(THEME_KEY, val);
+    refreshThemePreview();
   }
   function applyFontSize(px) {
     document.documentElement.style.setProperty('--fs-base', `${px}px`);
     state.fontsize = px;
     safeSet(FS_KEY, px);
+    refreshThemePreview();
   }
   const PALETTES = {
     blue: { primary: '#1d4ed8', accent: '#0ea5e9' },
@@ -289,21 +291,36 @@
     violet:{ primary: '#7c3aed', accent: '#a78bfa' },
     red:  { primary: '#dc2626', accent: '#ef4444' }
   };
+  const THEME_LABELS = { hell: 'Hell', dunkel: 'Dunkel', kontrast: 'Kontrast' };
+  const PALETTE_LABELS = { blue: 'Blau', green: 'Grün', violet: 'Violett', red: 'Rot' };
   function applyPalette(name) {
     const pal = PALETTES[name] || PALETTES.blue;
     const rootStyle = document.documentElement.style;
     rootStyle.setProperty('--primary', pal.primary);
     rootStyle.setProperty('--accent', pal.accent);
+    if (typeof hexToRgba === 'function') {
+      rootStyle.setProperty('--accent-soft', hexToRgba(pal.accent, 0.18));
+    }
     // Berechne automatisierte Textfarbe auf Buttons anhand Luminanz
     const lum = luminance(...Object.values(hexToRgb(pal.primary)));
     rootStyle.setProperty('--btn-on-primary', lum > 0.6 ? '#000000' : '#ffffff');
     state.palette = name;
     safeSet(PALETTE_KEY, name);
+    refreshThemePreview();
   }
   function luminance(r,g,b) {
     r/=255; g/=255; b/=255;
     const a=[r,g,b].map(v => v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4));
     return 0.2126*a[0] + 0.7152*a[1] + 0.0722*a[2];
+  }
+
+  function refreshThemePreview() {
+    const themeEl = byId('theme-preview-theme');
+    if (themeEl) themeEl.textContent = THEME_LABELS[state.theme] || state.theme || '—';
+    const paletteEl = byId('theme-preview-palette');
+    if (paletteEl) paletteEl.textContent = PALETTE_LABELS[state.palette] || state.palette || '—';
+    const fontEl = byId('theme-preview-font');
+    if (fontEl) fontEl.textContent = `${state.fontsize || '16'} px`;
   }
 
   /* Initialisierung der UI */
@@ -528,8 +545,14 @@
       // hervorzuheben. Zusätzlich erhält die Kopfzeile eine
       // halbtransparente Hintergrundfarbe.
       const mColor = MONTH_COLORS[m % MONTH_COLORS.length];
-      monthEl.style.borderColor = mColor;
-      monthEl.style.boxShadow = `0 0 0 2px ${mColor}`;
+      const accentShade = typeof hexToRgba === 'function' ? hexToRgba(mColor, 0.45) : mColor;
+      monthEl.style.borderColor = accentShade;
+      if (typeof hexToRgba === 'function') {
+        monthEl.style.boxShadow = `0 28px 70px -35px ${hexToRgba(mColor, 0.55)}`;
+      } else {
+        monthEl.style.boxShadow = 'var(--shadow-md)';
+      }
+      monthEl.style.setProperty('--month-accent', mColor);
       // Header
       const header = document.createElement('div');
       header.className = 'month-header';
@@ -543,7 +566,9 @@
         </div>
       `;
       // Kopfzeile mit transparenter Akzentfarbe hinterlegen
-      header.style.background = hexToRgba(mColor, 0.15);
+      header.style.background = typeof hexToRgba === 'function'
+        ? `linear-gradient(135deg, ${hexToRgba(mColor, 0.18)}, transparent)`
+        : '';
       // Grid
       const grid = document.createElement('div');
       grid.className = 'grid';
@@ -1443,6 +1468,7 @@
       logEvent(`Akzentfarbe geändert: ${e.target.value}`);
       renderLog();
     });
+    refreshThemePreview();
   }
 
   /* Tastatur‑Shortcuts */

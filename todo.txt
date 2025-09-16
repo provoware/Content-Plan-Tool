@@ -1,7 +1,7 @@
 - [x] Skip-Link in weiteren Seiten prüfen
 - [x] Weitere Tooltips für Einstellungen ergänzen
 - [x] Kontrastwerte im Dark-Theme testen
-- [ ] Farbschema weiter an Vorlage anpassen
+- [x] Farbschema weiter an Vorlage anpassen
 - [x] Module als Kartenlayout darstellen
 - [ ] Weitere Tests für Kalenderfunktionen ergänzen
 - [ ] Kartenbarrierefreiheit überprüfen
@@ -30,3 +30,6 @@
 
 - [x] Codebasis analysieren und Tests laufen lassen
 - [ ] Release vorbereiten: Dokumentation finalisieren und Cross-Browser-Tests durchführen
+- [ ] Live-Vorschau mit Nutzerfeedback testen
+- [ ] Mobile Darstellung der modernisierten Karten prüfen
+- [ ] README um Live-Vorschau ergänzen
