@@ -17,6 +17,8 @@
   const $ = helperSource.$ || ((sel, ctx = document) => (ctx || document).querySelector(sel));
   const $$ = helperSource.$$ || ((sel, ctx = document) => Array.from((ctx || document).querySelectorAll(sel)));
   const byId = helperSource.byId || (id => (typeof document !== 'undefined' ? document.getElementById(id) : null));
+  const quickActionHelper = (typeof globalThis !== 'undefined' && globalThis.QuickActionHelper) || {};
+  const releaseChecklistModule = (typeof globalThis !== 'undefined' && globalThis.ReleaseChecklist) || {};
   const fmt2 = n => String(n).padStart(2, '0');
   const today = new Date();
   const MONTHS = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
@@ -350,12 +352,20 @@
   }
 
   function syncQuickMonthSelector() {
+    const defaultMonth = (state.year === today.getFullYear()) ? today.getMonth() : 0;
+    if (quickActionHelper && typeof quickActionHelper.syncMonthSelector === 'function') {
+      quickActionHelper.syncMonthSelector({
+        helper: helperSource,
+        months: MONTHS,
+        defaultMonth
+      });
+      return;
+    }
     const quickSel = byId('quick-month');
     if (!quickSel) return;
     if (!quickSel.children.length) {
       quickSel.innerHTML = MONTHS.map((name, idx) => `<option value="${idx}">${fmt2(idx+1)} – ${name}</option>`).join('');
     }
-    const defaultMonth = (state.year === today.getFullYear()) ? today.getMonth() : 0;
     quickSel.value = String(defaultMonth);
   }
 
@@ -467,43 +477,58 @@
       });
     }
     // Quick actions im Kalender
-    syncQuickMonthSelector();
-    const quickTodayBtn = byId('quick-today');
-    if (quickTodayBtn) {
-      quickTodayBtn.addEventListener('click', () => {
-        focusToday();
+    const defaultQuickMonth = (state.year === today.getFullYear()) ? today.getMonth() : 0;
+    if (quickActionHelper && typeof quickActionHelper.initQuickActions === 'function') {
+      quickActionHelper.initQuickActions({
+        helper: helperSource,
+        focusToday,
+        jumpNextFree,
+        exportOpenDaysTXT,
+        openOverview,
+        updateStatus,
+        months: MONTHS,
+        getYear: () => state.year,
+        defaultMonth: defaultQuickMonth
       });
-    }
-    const quickFreeBtn = byId('quick-next-free');
-    if (quickFreeBtn) {
-      quickFreeBtn.addEventListener('click', () => {
-        jumpNextFree();
-      });
-    }
-    const quickExportBtn = byId('quick-open-export');
-    if (quickExportBtn) {
-      quickExportBtn.addEventListener('click', () => {
-        exportOpenDaysTXT();
-        updateStatus('TXT mit freien Tagen gespeichert');
-      });
-    }
-    const quickMonthSel = byId('quick-month');
-    const quickMonthBtn = byId('quick-month-overview');
-    if (quickMonthBtn && quickMonthSel) {
-      quickMonthBtn.addEventListener('click', () => {
-        const idx = parseInt(quickMonthSel.value, 10);
-        if (!Number.isNaN(idx)) {
-          openOverview('month', idx);
-          updateStatus(`Monatsübersicht geöffnet: ${MONTHS[idx]} ${state.year}`);
-        }
-      });
-    }
-    const quickYearBtn = byId('quick-year-overview');
-    if (quickYearBtn) {
-      quickYearBtn.addEventListener('click', () => {
-        openOverview('year');
-        updateStatus(`Jahresübersicht geöffnet: ${state.year}`);
-      });
+    } else {
+      syncQuickMonthSelector();
+      const quickTodayBtn = byId('quick-today');
+      if (quickTodayBtn) {
+        quickTodayBtn.addEventListener('click', () => {
+          focusToday();
+        });
+      }
+      const quickFreeBtn = byId('quick-next-free');
+      if (quickFreeBtn) {
+        quickFreeBtn.addEventListener('click', () => {
+          jumpNextFree();
+        });
+      }
+      const quickExportBtn = byId('quick-open-export');
+      if (quickExportBtn) {
+        quickExportBtn.addEventListener('click', () => {
+          exportOpenDaysTXT();
+          updateStatus('TXT mit freien Tagen gespeichert');
+        });
+      }
+      const quickMonthSel = byId('quick-month');
+      const quickMonthBtn = byId('quick-month-overview');
+      if (quickMonthBtn && quickMonthSel) {
+        quickMonthBtn.addEventListener('click', () => {
+          const idx = parseInt(quickMonthSel.value, 10);
+          if (!Number.isNaN(idx)) {
+            openOverview('month', idx);
+            updateStatus(`Monatsübersicht geöffnet: ${MONTHS[idx]} ${state.year}`);
+          }
+        });
+      }
+      const quickYearBtn = byId('quick-year-overview');
+      if (quickYearBtn) {
+        quickYearBtn.addEventListener('click', () => {
+          openOverview('year');
+          updateStatus(`Jahresübersicht geöffnet: ${state.year}`);
+        });
+      }
     }
     initCalendarTip();
     // Settings form: will be populated via buildSelectors() and applyTheme
@@ -559,6 +584,10 @@
           <button id="btn-scan-dupes" class="secondary small">Duplikate prüfen</button>
         </div>
       </div>
+      <div class="dash-section release-section">
+        <div class="dash-title">Release-Vorbereitung</div>
+        <div id="release-checklist" aria-live="polite"></div>
+      </div>
       <div class="dash-section">
         <div class="dash-title">Tipps</div>
         <ul class="muted" style="margin:0;padding-left:1rem;font-size:var(--fs-sm);">
@@ -568,6 +597,17 @@
         </ul>
       </div>
     `;
+    if (releaseChecklistModule && typeof releaseChecklistModule.init === 'function') {
+      releaseChecklistModule.init({
+        container: byId('release-checklist'),
+        helper: helperSource,
+        onStatus: updateStatus,
+        onLog(message) {
+          logEvent(message);
+          renderLog();
+        }
+      });
+    }
     // Event handlers for dashboard buttons
     byId('btn-export-open')?.addEventListener('click', exportOpenDaysTXT);
     byId('btn-month-txt')?.addEventListener('click', exportCurrentMonthTXT);

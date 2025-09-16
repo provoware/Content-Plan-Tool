@@ -34,4 +34,5 @@
 - [x] Mobile Darstellung der modernisierten Karten prüfen
 - [x] README um Live-Vorschau ergänzen
 - [x] Schnellaktionen dokumentieren (README & Anleitung)
-- [ ] Schnellaktionen mit UI-Tests absichern
+- [x] Schnellaktionen mit UI-Tests absichern
+- [ ] Release-Checkliste auf mobilen Geräten testen
