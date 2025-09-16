@@ -45,6 +45,19 @@
       <section id="calendar-section" class="module active" aria-label="Kalender">
         <div class="section-header">
           <h2>Kalender</h2>
+          <div class="section-actions" role="toolbar" aria-label="Schnellaktionen für den Kalender">
+            <div class="section-actions-group" role="group" aria-label="Zu relevanten Tagen springen">
+              <button type="button" id="quick-today" class="secondary small" title="Zum heutigen Tag springen">Heute</button>
+              <button type="button" id="quick-next-free" class="secondary small" title="Nächsten freien Tag öffnen">Freier Tag</button>
+              <button type="button" id="quick-open-export" class="secondary small" title="Liste aller freien Tage als TXT speichern">Freie Tage TXT</button>
+            </div>
+            <div class="section-actions-group" role="group" aria-label="Übersichten öffnen">
+              <label for="quick-month" class="sr-only">Monatsübersicht auswählen</label>
+              <select id="quick-month" class="quick-select" title="Monatsübersicht auswählen"></select>
+              <button type="button" id="quick-month-overview" class="secondary small" title="Monatsübersicht anzeigen">Monatsübersicht</button>
+              <button type="button" id="quick-year-overview" class="secondary small" title="Jahresübersicht anzeigen">Jahresübersicht</button>
+            </div>
+          </div>
         </div>
         <div class="calendar-wrapper">
           <!-- Der Kalender selbst wird vom Skript in #calendar erzeugt -->

@@ -323,6 +323,16 @@
     if (fontEl) fontEl.textContent = `${state.fontsize || '16'} px`;
   }
 
+  function syncQuickMonthSelector() {
+    const quickSel = byId('quick-month');
+    if (!quickSel) return;
+    if (!quickSel.children.length) {
+      quickSel.innerHTML = MONTHS.map((name, idx) => `<option value="${idx}">${fmt2(idx+1)} – ${name}</option>`).join('');
+    }
+    const defaultMonth = (state.year === today.getFullYear()) ? today.getMonth() : 0;
+    quickSel.value = String(defaultMonth);
+  }
+
   /* Initialisierung der UI */
   function initUI() {
     // Navigation: show/hide modules
@@ -385,6 +395,45 @@
           renderLog();
           updateStatus('Zurückgesetzt');
         }
+      });
+    }
+    // Quick actions im Kalender
+    syncQuickMonthSelector();
+    const quickTodayBtn = byId('quick-today');
+    if (quickTodayBtn) {
+      quickTodayBtn.addEventListener('click', () => {
+        focusToday();
+      });
+    }
+    const quickFreeBtn = byId('quick-next-free');
+    if (quickFreeBtn) {
+      quickFreeBtn.addEventListener('click', () => {
+        jumpNextFree();
+      });
+    }
+    const quickExportBtn = byId('quick-open-export');
+    if (quickExportBtn) {
+      quickExportBtn.addEventListener('click', () => {
+        exportOpenDaysTXT();
+        updateStatus('TXT mit freien Tagen gespeichert');
+      });
+    }
+    const quickMonthSel = byId('quick-month');
+    const quickMonthBtn = byId('quick-month-overview');
+    if (quickMonthBtn && quickMonthSel) {
+      quickMonthBtn.addEventListener('click', () => {
+        const idx = parseInt(quickMonthSel.value, 10);
+        if (!Number.isNaN(idx)) {
+          openOverview('month', idx);
+          updateStatus(`Monatsübersicht geöffnet: ${MONTHS[idx]} ${state.year}`);
+        }
+      });
+    }
+    const quickYearBtn = byId('quick-year-overview');
+    if (quickYearBtn) {
+      quickYearBtn.addEventListener('click', () => {
+        openOverview('year');
+        updateStatus(`Jahresübersicht geöffnet: ${state.year}`);
       });
     }
     // Settings form: will be populated via buildSelectors() and applyTheme
@@ -1437,7 +1486,9 @@
       updateDashboard();
       logEvent(`Jahr geändert: ${state.year}`);
       renderLog();
+      syncQuickMonthSelector();
     });
+    syncQuickMonthSelector();
     // Theme
     const themeSel = byId('theme');
     themeSel.value = normalizeTheme(state.theme);
@@ -1520,25 +1571,51 @@
     }
   });
   function focusToday() {
-    const ymd = `${today.getFullYear()}-${fmt2(today.getMonth()+1)}-${fmt2(today.getDate())}`;
+    const currentYear = today.getFullYear();
+    if (state.year !== currentYear) {
+      const yearSel = byId('year');
+      if (yearSel) {
+        yearSel.value = String(currentYear);
+        yearSel.dispatchEvent(new Event('change', { bubbles: true }));
+      } else {
+        state.year = currentYear;
+        renderCalendar();
+        updateDashboard();
+        syncQuickMonthSelector();
+      }
+    }
+    const ymd = `${currentYear}-${fmt2(today.getMonth()+1)}-${fmt2(today.getDate())}`;
     const cell = document.querySelector(`.day[data-ymd="${ymd}"]`);
     if (cell) {
       cell.scrollIntoView({behavior:'smooth',block:'center'});
       cell.focus();
       openDrawer(ymd);
+      updateStatus('Heute geöffnet');
+      return true;
     }
+    updateStatus('Heute liegt außerhalb des aktuellen Plans');
+    return false;
   }
   function jumpNextFree() {
     const keys = Object.keys(allDays()).sort();
-    const firstFree = keys.find(k => !isUsed(state.items[k]));
-    if (firstFree) {
-      const cell = document.querySelector(`.day[data-ymd="${firstFree}"]`);
-      if (cell) {
-        cell.scrollIntoView({behavior:'smooth',block:'center'});
-        cell.focus();
-        openDrawer(firstFree);
-      }
+    const start = (state.year === today.getFullYear())
+      ? `${state.year}-${fmt2(today.getMonth()+1)}-${fmt2(today.getDate())}`
+      : `${state.year}-01-01`;
+    const firstFree = keys.find(k => k >= start && !isUsed(state.items[k]));
+    if (!firstFree) {
+      updateStatus('Keine freien Tage im aktuellen Jahr gefunden');
+      return false;
     }
+    const cell = document.querySelector(`.day[data-ymd="${firstFree}"]`);
+    if (cell) {
+      cell.scrollIntoView({behavior:'smooth',block:'center'});
+      cell.focus();
+      openDrawer(firstFree);
+      updateStatus(`Freier Tag geöffnet: ${firstFree.split('-').reverse().join('.')}`);
+      return true;
+    }
+    updateStatus('Freier Tag konnte nicht angezeigt werden');
+    return false;
   }
 
   /* Helfer HTML Escaping */

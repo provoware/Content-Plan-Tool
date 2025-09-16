@@ -21,7 +21,7 @@
 - [x] Startroutine für automatische Einrichtung hinzufügen
 - [x] Tests für Startroutine ergänzen
 - [x] Tests für Clipboard-Fallback ergänzen
- - [x] Tests für Vollbild-Shortcut ergänzen
+- [x] Tests für Vollbild-Shortcut ergänzen
 - [x] Tests für Vollbild-Fallback ergänzen
 - [x] Themes prüfen und ungültige Angaben auf „Hell“ setzen
 - [x] Fokusdarstellung und Zielgröße der Pillen verbessern
@@ -31,5 +31,7 @@
 - [x] Codebasis analysieren und Tests laufen lassen
 - [ ] Release vorbereiten: Dokumentation finalisieren und Cross-Browser-Tests durchführen
 - [ ] Live-Vorschau mit Nutzerfeedback testen
-- [ ] Mobile Darstellung der modernisierten Karten prüfen
+- [x] Mobile Darstellung der modernisierten Karten prüfen
 - [ ] README um Live-Vorschau ergänzen
+- [ ] Schnellaktionen dokumentieren (README & Anleitung)
+- [ ] Schnellaktionen mit UI-Tests absichern
