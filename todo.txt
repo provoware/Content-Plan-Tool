@@ -31,6 +31,7 @@
 - [x] Codebasis analysieren und Tests laufen lassen
 - [x] Release-Checkliste um Status-Badge und Notizfelder erweitern
 - [x] Release-Checkliste mobil gestalten (Layout & Eingaben optimieren)
+- [x] Release-Checkliste mit Next-Step-Assistent ergänzen
 - [ ] Release vorbereiten: Dokumentation finalisieren und Cross-Browser-Tests durchführen
 - [ ] Live-Vorschau mit Nutzerfeedback testen
 - [x] Mobile Darstellung der modernisierten Karten prüfen

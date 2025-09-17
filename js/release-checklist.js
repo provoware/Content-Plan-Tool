@@ -41,6 +41,11 @@
     }
   ];
 
+  function isTaskDone(state = {}, taskId) {
+    const entry = state ? state[taskId] : undefined;
+    return typeof entry === 'object' ? Boolean(entry && entry.done) : Boolean(entry);
+  }
+
   function readState(helper) {
     const getter = helper && typeof helper.safeGet === 'function' ? helper.safeGet : () => null;
     try {
@@ -85,11 +90,7 @@
 
   function computeSummary(state = {}) {
     const total = TASKS.length;
-    const completed = TASKS.reduce((count, task) => {
-      const entry = state[task.id];
-      const done = typeof entry === 'object' ? Boolean(entry && entry.done) : Boolean(entry);
-      return count + (done ? 1 : 0);
-    }, 0);
+    const completed = TASKS.reduce((count, task) => count + (isTaskDone(state, task.id) ? 1 : 0), 0);
     const percent = total ? Math.round((completed / total) * 100) : 0;
     return {
       total,
@@ -97,6 +98,10 @@
       percent,
       label: `${completed} von ${total} erledigt (${percent}${NBSP_NARROW}%)`
     };
+  }
+
+  function findNextTask(state = {}) {
+    return TASKS.find(task => !isTaskDone(state, task.id)) || null;
   }
 
   function setTask(state = {}, taskId, done) {
@@ -151,6 +156,7 @@
     }
     let state = readState(helper);
     const summary = computeSummary(state);
+    const taskMap = new Map();
 
     container.innerHTML = '';
     if (container.classList) container.classList.add('release-card');
@@ -191,6 +197,58 @@
     header.appendChild(meterBox);
     container.appendChild(header);
 
+    const nextBox = document.createElement('div');
+    nextBox.className = 'release-card__next';
+    const nextTitle = document.createElement('p');
+    nextTitle.className = 'release-card__next-title';
+    const nextInfo = document.createElement('p');
+    nextInfo.className = 'release-card__next-info';
+    nextInfo.setAttribute('aria-live', 'polite');
+    const nextButton = document.createElement('button');
+    nextButton.type = 'button';
+    nextButton.className = 'release-card__next-button';
+    nextButton.textContent = 'Jetzt starten';
+    nextBox.appendChild(nextTitle);
+    nextBox.appendChild(nextInfo);
+    nextBox.appendChild(nextButton);
+    container.appendChild(nextBox);
+
+    const prefersReducedMotion = typeof window !== 'undefined'
+      && typeof window.matchMedia === 'function'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function focusTask(taskId) {
+      const entry = taskMap.get(taskId);
+      if (!entry) return;
+      const behavior = prefersReducedMotion ? 'auto' : 'smooth';
+      if (entry.item && typeof entry.item.scrollIntoView === 'function') {
+        try {
+          entry.item.scrollIntoView({ behavior, block: 'center' });
+        } catch (err) {
+          entry.item.scrollIntoView();
+        }
+      }
+      entry.item.classList.add('release-card__item--highlight');
+      if (entry.checkbox && typeof entry.checkbox.focus === 'function') {
+        entry.checkbox.focus();
+      }
+      if (prefersReducedMotion) {
+        entry.item.classList.remove('release-card__item--highlight');
+      } else {
+        setTimeout(() => entry.item.classList.remove('release-card__item--highlight'), 1400);
+      }
+      if (typeof onStatus === 'function') {
+        onStatus(`Nächster Schritt fokussiert: ${entry.title}`);
+      }
+    }
+
+    nextButton.addEventListener('click', () => {
+      const targetId = nextButton.dataset.target;
+      if (targetId) {
+        focusTask(targetId);
+      }
+    });
+
     const list = document.createElement('ul');
     list.className = 'release-card__list';
 
@@ -203,8 +261,7 @@
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.dataset.task = task.id;
-      const entry = state[task.id];
-      checkbox.checked = typeof entry === 'object' ? Boolean(entry.done) : Boolean(entry);
+      checkbox.checked = isTaskDone(state, task.id);
       checkbox.setAttribute('aria-describedby', `${task.id}-hint`);
 
       const textWrap = document.createElement('span');
@@ -262,6 +319,7 @@
       noteField.placeholder = task.notePlaceholder || 'Kurznotiz erfassen…';
       const taskNotes = state.notes && typeof state.notes === 'object' ? state.notes[task.id] : '';
       noteField.value = typeof taskNotes === 'string' ? taskNotes : '';
+      taskMap.set(task.id, { item, checkbox, noteField, title: task.title });
       noteField.addEventListener('change', () => {
         state = setNote(state, task.id, noteField.value);
         writeState(helper, state);
@@ -292,6 +350,7 @@
         const statusData = describeStatus(updated.percent);
         statusBadge.textContent = statusData.label;
         statusBadge.dataset.tone = statusData.tone;
+        updateNextStep(state, updated);
         if (typeof onStatus === 'function') {
           onStatus(checkbox.checked
             ? `Release-Aufgabe erledigt: ${task.title}`
@@ -323,6 +382,36 @@
     footer.appendChild(footerText);
     footer.appendChild(guideLink);
     container.appendChild(footer);
+
+    function updateNextStep(currentState, summaryData) {
+      const currentSummary = summaryData || computeSummary(currentState);
+      const nextTask = findNextTask(currentState);
+      if (nextTask) {
+        nextBox.dataset.state = 'pending';
+        nextTitle.textContent = 'Nächster Schritt';
+        nextInfo.textContent = `Fehlt noch: ${nextTask.title}. ${nextTask.description}`;
+        nextButton.disabled = false;
+        nextButton.dataset.target = nextTask.id;
+        nextButton.textContent = 'Jetzt starten';
+      } else {
+        nextBox.dataset.state = 'done';
+        nextTitle.textContent = 'Release-Check abgeschlossen';
+        nextInfo.textContent = 'Alle Aufgaben sind erledigt. Starte nun den finalen Build und plane die Veröffentlichung.';
+        nextButton.disabled = true;
+        nextButton.removeAttribute('data-target');
+        nextButton.textContent = 'Fertig';
+      }
+      return currentSummary;
+    }
+
+    updateNextStep(state, summary);
+
+    if (typeof onStatus === 'function') {
+      onStatus(`Release-Checkliste geladen – ${summary.completed} von ${summary.total} erledigt.`);
+    }
+    if (typeof onLog === 'function') {
+      onLog(`Release-Checkliste geladen – ${summary.completed}/${summary.total} erledigt`);
+    }
 
     return { summary };
   }

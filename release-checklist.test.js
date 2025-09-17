@@ -47,9 +47,19 @@ describe('ReleaseChecklist module', () => {
     });
 
     expect(summary.completed).toBe(1);
+    expect(status.mock.calls.some(call => call[0].includes('geladen'))).toBe(true);
+    expect(log.mock.calls.some(call => call[0].includes('geladen'))).toBe(true);
     const checkboxes = document.querySelectorAll('#rc input[type="checkbox"]');
     expect(checkboxes).toHaveLength(3);
     expect(checkboxes[0].checked).toBe(true);
+
+    const nextInfo = document.querySelector('.release-card__next-info');
+    const nextTitle = document.querySelector('.release-card__next-title');
+    const nextButton = document.querySelector('.release-card__next-button');
+    expect(nextTitle.textContent).toContain('Nächster Schritt');
+    expect(nextInfo.textContent).toContain('Cross-Browser');
+    expect(nextButton.disabled).toBe(false);
+    expect(nextButton.dataset.target).toBe('browsers');
 
     checkboxes[1].click();
     expect(helper.safeSet).toHaveBeenCalled();
@@ -62,9 +72,20 @@ describe('ReleaseChecklist module', () => {
     expect(progressText).toMatch(/2 von 3/);
     const badge = document.querySelector('.release-card__status');
     expect(badge.textContent).toMatch(/Gut unterwegs|Fast geschafft|Bereit für Release|Noch Aufgaben offen/);
+    expect(nextInfo.textContent).toContain('Live-Vorschau');
+    expect(nextButton.dataset.target).toBe('feedback');
 
     checkboxes[1].click();
     expect(status.mock.calls.some(call => call[0].includes('reaktiviert'))).toBe(true);
+    expect(nextInfo.textContent).toContain('Cross-Browser');
+    expect(nextButton.dataset.target).toBe('browsers');
+
+    checkboxes.forEach(box => {
+      if (!box.checked) box.click();
+    });
+    expect(nextButton.disabled).toBe(true);
+    expect(nextTitle.textContent).toContain('Release-Check abgeschlossen');
+    expect(nextInfo.textContent).toContain('Alle Aufgaben');
   });
 
   test('init renders note fields and saves updates', () => {
