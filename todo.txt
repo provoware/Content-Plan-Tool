@@ -39,3 +39,13 @@
 - [x] Schnellaktionen dokumentieren (README & Anleitung)
 - [x] Schnellaktionen mit UI-Tests absichern
 - [ ] Release-Checkliste auf mobilen Geräten testen (manuell nach Build)
+- [x] IndexedDB-Speicher + Migrationen
+- [x] Atomare Save-Pipeline mit Snapshots/Hashes
+- [x] Health-Monitor (Ampel) + Safe-Mode
+- [ ] Service Worker + Web-App-Manifest (PWA)
+- [ ] File System Access API-Backups mit Rotation
+- [ ] Plugin-API + Modul-Registry + Event-Bus
+- [ ] Geführte Wizards für neue/serielle Einträge
+- [ ] Axe-Core + Playwright Tests (offline)
+- [ ] Startskript + .desktop + grafischer Bootstrap
+- [ ] Stylelint/ESLint/Prettier in npm run qa integriert

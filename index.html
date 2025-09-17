@@ -143,6 +143,23 @@
             </div>
             <small class="muted">So wirkt deine Auswahl direkt im Kalender. Änderungen an Theme, Akzentfarbe und Textgröße werden sofort übernommen.</small>
           </div>
+          <div class="form-group storage-health-group">
+            <span class="form-label">Speicher &amp; Sicherheit</span>
+            <div id="storage-health" class="storage-health" role="status" aria-live="polite">
+              <span class="storage-health__light" aria-hidden="true"></span>
+              <span class="storage-health__text">Speicher initialisieren …</span>
+            </div>
+            <div class="storage-health__meta">
+              <span id="storage-driver">Treiber: unbekannt</span>
+              <span id="storage-hash">Letzter Hash: —</span>
+            </div>
+            <div class="storage-health__actions" role="group" aria-label="Speichersicherheit steuern">
+              <button type="button" id="storage-safe-mode" class="secondary small">Safe-Mode aktivieren</button>
+              <button type="button" id="storage-show-snapshots" class="secondary small">Snapshots anzeigen</button>
+            </div>
+            <div id="storage-snapshots" class="storage-snapshots" aria-live="polite" role="list"></div>
+            <small class="muted">Im Safe-Mode (Schreibschutz) werden keine Änderungen gespeichert. Über „Snapshots anzeigen“ prüfst du die letzten Sicherungen.</small>
+          </div>
           <div class="form-group">
             <button type="button" id="clear-data-btn" class="warn">Daten löschen</button>
           </div>
@@ -259,6 +276,7 @@
   <script src="js/theme-util.js" onerror="this.src='theme-util.js'"></script>
   <script src="js/fullscreen-util.js" onerror="this.src='fullscreen-util.js'"></script>
   <script src="js/clipboard-util.js" onerror="this.src='clipboard-util.js'"></script>
+  <script src="js/storage-manager.js" onerror="this.src='storage-manager.js'"></script>
   <script src="js/quick-actions.js" onerror="this.src='quick-actions.js'"></script>
   <script src="js/release-checklist.js" onerror="this.src='release-checklist.js'"></script>
   <script src="js/app.js" onerror="this.src='app.js'"></script>

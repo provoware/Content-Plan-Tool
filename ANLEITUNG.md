@@ -56,9 +56,10 @@ Im Bereich **Einstellungen** stehen dir folgende Optionen zur Verfügung:
 | Akzentfarbe     | Blau, Grün, Violett oder Rot. Beeinflusst Highlights. |
 | Textgröße       | Vier Skalierungen von 100 % bis 137 %.                 |
 | Live‑Vorschau   | Zeigt ein Kartenbeispiel mit Buttons, Pillen und Textgröße, damit du Theme, Akzentfarbe und Schriftwirkung sofort beurteilen kannst. |
+| Speicher &amp; Sicherheit | Zeigt den aktiven Speicher (IndexedDB oder Fallback), den letzten Hash sowie die jüngsten Snapshots an. Der Button „Safe-Mode aktivieren“ schaltet einen Schreibschutz für alle Speicheraktionen. |
 | Daten löschen   | Setzt alle Einträge und Einstellungen zurück.         |
 
-Die Einstellungen werden sofort angewandt und gespeichert. Sollte dein Browser keinen Zugriff auf `localStorage` erlauben (z. B. im privaten Modus), greift ein In‑Memory‑Fallback; die Daten gehen dann jedoch beim Schließen des Fensters verloren.
+Die Einstellungen werden sofort angewandt und gespeichert. Sollte dein Browser keinen Zugriff auf `localStorage` erlauben (z. B. im privaten Modus), greift ein In‑Memory‑Fallback; die Daten gehen dann jedoch beim Schließen des Fensters verloren. Der Abschnitt **Speicher &amp; Sicherheit** informiert dich zusätzlich, ob die IndexedDB korrekt läuft. Dort kannst du auch den Safe-Mode aktivieren: Er sperrt sämtliche Speicheraktionen (praktisch für Sicherheitsaudits). Nach dem Deaktivieren kehrt das Tool zum vorherigen Autosave-Status zurück.
 
 ## 5 – Tastenkürzel
 

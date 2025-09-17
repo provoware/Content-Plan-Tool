@@ -118,4 +118,45 @@ describe('ReleaseChecklist module', () => {
     expect(status.mock.calls.some(call => call[0].includes('Notiz gespeichert'))).toBe(true);
     expect(log.mock.calls.some(call => call[0].includes('Notiz aktualisiert'))).toBe(true);
   });
+
+  test('init synchronises with external storage manager', async () => {
+    document.body.innerHTML = '<div id="rc"></div>';
+    const helper = {
+      safeGet: jest.fn().mockReturnValue(JSON.stringify({ docs: true })),
+      safeSet: jest.fn()
+    };
+    const storage = {
+      getReleaseStateSync: jest.fn().mockReturnValue({ docs: { done: true } }),
+      saveReleaseState: jest.fn().mockResolvedValue({}),
+      subscribeRelease: jest.fn()
+    };
+    let listener = null;
+    storage.subscribeRelease.mockImplementation(cb => {
+      listener = cb;
+      return () => {};
+    });
+
+    init({
+      container: document.getElementById('rc'),
+      helper,
+      storage
+    });
+
+    const checkboxes = document.querySelectorAll('#rc input[type="checkbox"]');
+    expect(checkboxes[0].checked).toBe(true);
+    checkboxes[1].checked = true;
+    checkboxes[1].dispatchEvent(new Event('change', { bubbles: true }));
+    expect(storage.saveReleaseState).toHaveBeenCalled();
+    expect(storage.saveReleaseState.mock.calls[0][1]).toMatchObject({ taskId: 'browsers' });
+
+    expect(typeof listener).toBe('function');
+    listener({
+      docs: { done: true },
+      browsers: { done: true },
+      notes: { browsers: 'Extern synchronisiert' }
+    });
+    const noteField = document.getElementById('browsers-note');
+    expect(noteField.value).toBe('Extern synchronisiert');
+    expect(checkboxes[1].checked).toBe(true);
+  });
 });

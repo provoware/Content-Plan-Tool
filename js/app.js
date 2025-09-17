@@ -19,6 +19,10 @@
   const byId = helperSource.byId || (id => (typeof document !== 'undefined' ? document.getElementById(id) : null));
   const quickActionHelper = (typeof globalThis !== 'undefined' && globalThis.QuickActionHelper) || {};
   const releaseChecklistModule = (typeof globalThis !== 'undefined' && globalThis.ReleaseChecklist) || {};
+  const storageManagerModule = (typeof globalThis !== 'undefined' && globalThis.StorageManager) || null;
+  const storageManager = storageManagerModule && typeof storageManagerModule.create === 'function'
+    ? storageManagerModule.create({ helper: helperSource })
+    : null;
   const fmt2 = n => String(n).padStart(2, '0');
   const today = new Date();
   const MONTHS = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
@@ -55,6 +59,8 @@
   let autosaveEnabled = true;
   // ID des Autosave‑Intervalls (wird bei Aktivierung gesetzt)
   let autosaveInterval = null;
+  let storageSafeMode = false;
+  let autosaveBeforeSafeMode = true;
 
   /* Speicher‑Wrapper mit Fallback (zentralisiert in helper-util) */
   const rawSafeGet = helperSource.safeGet || (key => {
@@ -92,10 +98,18 @@
   }
 
   function safeSet(key, value) {
+    if (storageSafeMode) {
+      updateStatus('Safe-Mode aktiv – Speichern übersprungen');
+      return false;
+    }
     return rawSafeSet(key, value, { onFallback: storageFallback });
   }
 
   function safeRemove(key) {
+    if (storageSafeMode) {
+      updateStatus('Safe-Mode aktiv – Änderungen gesperrt');
+      return false;
+    }
     return rawSafeRemove(key);
   }
 
@@ -158,6 +172,10 @@
     }
   }
   function persistState() {
+    if (storageSafeMode) {
+      updateStatus('Safe-Mode aktiv – Speichern übersprungen');
+      return;
+    }
     history.push(previousState);
     previousState = JSON.stringify(state);
     try {
@@ -601,6 +619,7 @@
       releaseChecklistModule.init({
         container: byId('release-checklist'),
         helper: helperSource,
+        storage: storageManager,
         onStatus: updateStatus,
         onLog(message) {
           logEvent(message);
@@ -1494,6 +1513,17 @@
     if (stEl) stEl.textContent = `Speicher: ${storageStatus}`;
     const szEl = byId('debug-size');
     if (szEl) szEl.textContent = `Zustandsgröße: ${sizeKB.toFixed(1)} KB`;
+    const driverEl = byId('storage-driver');
+    if (driverEl) {
+      const driver = storageManager ? storageManager.getDriver() : storageStatus;
+      const label = driver === 'indexeddb' ? 'IndexedDB' : driver === 'memory' ? 'Fallback' : storageStatus;
+      driverEl.textContent = `Treiber: ${label}`;
+    }
+    const hashEl = byId('storage-hash');
+    if (hashEl) {
+      const hash = storageManager && storageManager.getLastHash();
+      hashEl.textContent = `Letzter Hash: ${hash || '—'}`;
+    }
   }
 
   /* Zeigt Debug‑Ergebnisse an */
@@ -1583,6 +1613,144 @@
     if (autosaveInterval) {
       clearInterval(autosaveInterval);
       autosaveInterval = null;
+    }
+  }
+
+  function updateSafeModeButton() {
+    const btn = byId('storage-safe-mode');
+    if (!btn) return;
+    btn.textContent = storageSafeMode ? 'Safe-Mode deaktivieren' : 'Safe-Mode aktivieren';
+    btn.setAttribute('aria-pressed', storageSafeMode ? 'true' : 'false');
+  }
+
+  function setSafeMode(enabled) {
+    const next = Boolean(enabled);
+    if (storageSafeMode === next) {
+      updateSafeModeButton();
+      return;
+    }
+    storageSafeMode = next;
+    if (storageSafeMode) {
+      autosaveBeforeSafeMode = autosaveEnabled;
+      autosaveEnabled = false;
+      stopAutoSave();
+      updateStatus('Safe-Mode aktiv – Speichern pausiert');
+    } else {
+      autosaveEnabled = autosaveBeforeSafeMode;
+      if (autosaveEnabled) {
+        startAutoSave();
+      } else {
+        stopAutoSave();
+      }
+      updateStatus('Safe-Mode deaktiviert – Speichern wieder aktiv');
+    }
+    const body = document.body;
+    if (body && body.classList) {
+      body.classList.toggle('safe-mode', storageSafeMode);
+    }
+    updateSafeModeButton();
+  }
+
+  function initStorageMonitor() {
+    const panel = byId('storage-health');
+    if (!panel) return;
+    const textEl = panel.querySelector('.storage-health__text');
+    const driverEl = byId('storage-driver');
+    const hashEl = byId('storage-hash');
+    const snapshotsEl = byId('storage-snapshots');
+    const safeModeBtn = byId('storage-safe-mode');
+    const snapshotBtn = byId('storage-show-snapshots');
+
+    function setTone(tone, message) {
+      panel.dataset.tone = tone;
+      if (textEl) textEl.textContent = message;
+    }
+
+    function refreshSnapshots() {
+      if (!snapshotsEl) return;
+      if (!storageManager) {
+        snapshotsEl.innerHTML = '';
+        const entry = document.createElement('div');
+        entry.className = 'storage-snapshots__item';
+        entry.textContent = 'Snapshots stehen nur mit IndexedDB zur Verfügung.';
+        snapshotsEl.appendChild(entry);
+        return;
+      }
+      storageManager.getSnapshots(5).then(items => {
+        snapshotsEl.innerHTML = '';
+        if (!items || !items.length) {
+          const entry = document.createElement('div');
+          entry.className = 'storage-snapshots__item';
+          entry.textContent = 'Noch keine Snapshots gespeichert.';
+          snapshotsEl.appendChild(entry);
+          return;
+        }
+        items.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'storage-snapshots__item';
+          const time = document.createElement('span');
+          time.className = 'tag';
+          time.textContent = new Date(item.createdAt).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+          const hash = document.createElement('span');
+          hash.textContent = `Hash ${item.hash || '—'}`;
+          row.appendChild(time);
+          row.appendChild(hash);
+          snapshotsEl.appendChild(row);
+        });
+      });
+    }
+
+    if (!storageManager) {
+      setTone('warn', 'Fallbackspeicher aktiv – sichere regelmäßig externe Backups.');
+      if (driverEl) driverEl.textContent = 'Treiber: Fallback';
+      if (hashEl) hashEl.textContent = 'Letzter Hash: —';
+      if (snapshotBtn) {
+        snapshotBtn.disabled = true;
+        snapshotBtn.textContent = 'Snapshots nicht verfügbar';
+      }
+      refreshSnapshots();
+      updateSafeModeButton();
+      return;
+    }
+
+    storageManager.whenReady().then(info => {
+      const ok = info && info.driver === 'indexeddb';
+      setTone(ok ? 'ok' : 'warn', ok
+        ? 'IndexedDB aktiv – Snapshots laufen.'
+        : 'IndexedDB-Fallback aktiv – Daten werden temporär gesichert.');
+      if (driverEl) driverEl.textContent = `Treiber: ${ok ? 'IndexedDB' : 'Fallback'}`;
+      if (hashEl) {
+        const hash = storageManager.getLastHash();
+        hashEl.textContent = `Letzter Hash: ${hash || '—'}`;
+      }
+      refreshSnapshots();
+    });
+
+    storageManager.subscribeStatus(({ level, message }) => {
+      const tone = level === 'error' ? 'error' : level === 'warn' ? 'warn' : 'ok';
+      setTone(tone, message);
+    });
+
+    storageManager.subscribeRelease(() => {
+      if (hashEl) {
+        const hash = storageManager.getLastHash();
+        hashEl.textContent = `Letzter Hash: ${hash || '—'}`;
+      }
+      refreshSnapshots();
+    });
+
+    if (snapshotBtn) {
+      snapshotBtn.addEventListener('click', () => {
+        refreshSnapshots();
+        updateStatus('Snapshots aktualisiert');
+      });
+    }
+
+    if (safeModeBtn) {
+      updateSafeModeButton();
+      safeModeBtn.addEventListener('click', () => {
+        setSafeMode(!storageSafeMode);
+      });
     }
   }
 
@@ -1854,6 +2022,7 @@
   setInterval(updateClock, 1000);
   renderLog();
   updateStatus('Bereit');
+  initStorageMonitor();
   // Debug initialisieren (enthält Autosave‑Start)
   initDebug();
   // Scroll zu aktuellem Monat bei Start

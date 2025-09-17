@@ -46,6 +46,32 @@
     return typeof entry === 'object' ? Boolean(entry && entry.done) : Boolean(entry);
   }
 
+  function normalizeState(raw) {
+    if (!raw || typeof raw !== 'object') return {};
+    const next = {};
+    if (raw.notes && typeof raw.notes === 'object') {
+      const notes = {};
+      Object.keys(raw.notes).forEach(key => {
+        const value = raw.notes[key];
+        if (typeof value === 'string') {
+          notes[key] = value;
+        }
+      });
+      if (Object.keys(notes).length > 0) {
+        next.notes = notes;
+      }
+    }
+    TASKS.forEach(task => {
+      const entry = raw[task.id];
+      if (typeof entry === 'object') {
+        next[task.id] = { done: Boolean(entry.done) };
+      } else if (entry) {
+        next[task.id] = true;
+      }
+    });
+    return next;
+  }
+
   function readState(helper) {
     const getter = helper && typeof helper.safeGet === 'function' ? helper.safeGet : () => null;
     try {
@@ -53,23 +79,7 @@
       if (typeof raw !== 'string' || raw === '') return {};
       const parsed = JSON.parse(raw);
       if (!parsed || typeof parsed !== 'object') return {};
-      if (parsed.notes && typeof parsed.notes !== 'object') {
-        delete parsed.notes;
-      }
-      if (parsed.notes) {
-        Object.keys(parsed.notes).forEach(key => {
-          const value = parsed.notes[key];
-          if (typeof value !== 'string') {
-            delete parsed.notes[key];
-          } else {
-            parsed.notes[key] = value;
-          }
-        });
-        if (Object.keys(parsed.notes).length === 0) {
-          delete parsed.notes;
-        }
-      }
-      return parsed;
+      return normalizeState(parsed);
     } catch (err) {
       return {};
     }
@@ -149,12 +159,22 @@
     return next;
   }
 
+  function statesEqual(a, b) {
+    try {
+      return JSON.stringify(a) === JSON.stringify(b);
+    } catch (err) {
+      return false;
+    }
+  }
+
   function init(options = {}) {
-    const { container, helper, onStatus, onLog } = options;
+    const { container, helper, onStatus, onLog, storage } = options;
     if (!container || typeof container !== 'object') {
       return { summary: computeSummary({}) };
     }
-    let state = readState(helper);
+    let state = storage && typeof storage.getReleaseStateSync === 'function'
+      ? normalizeState(storage.getReleaseStateSync())
+      : readState(helper);
     const summary = computeSummary(state);
     const taskMap = new Map();
 
@@ -321,8 +341,15 @@
       noteField.value = typeof taskNotes === 'string' ? taskNotes : '';
       taskMap.set(task.id, { item, checkbox, noteField, title: task.title });
       noteField.addEventListener('change', () => {
-        state = setNote(state, task.id, noteField.value);
+        state = normalizeState(setNote(state, task.id, noteField.value));
         writeState(helper, state);
+        if (storage && typeof storage.saveReleaseState === 'function') {
+          storage.saveReleaseState(state, { type: 'note', taskId: task.id }).catch(err => {
+            if (typeof onStatus === 'function') {
+              onStatus(`Speichern (IndexedDB) fehlgeschlagen: ${err && err.message ? err.message : err}`);
+            }
+          });
+        }
         if (typeof onStatus === 'function') {
           if (noteField.value && noteField.value.trim()) {
             onStatus(`Notiz gespeichert: ${task.title}`);
@@ -341,8 +368,15 @@
       item.appendChild(noteWrap);
 
       checkbox.addEventListener('change', () => {
-        state = setTask(state, task.id, checkbox.checked);
+        state = normalizeState(setTask(state, task.id, checkbox.checked));
         writeState(helper, state);
+        if (storage && typeof storage.saveReleaseState === 'function') {
+          storage.saveReleaseState(state, { type: 'task', taskId: task.id, done: checkbox.checked }).catch(err => {
+            if (typeof onStatus === 'function') {
+              onStatus(`Speichern (IndexedDB) fehlgeschlagen: ${err && err.message ? err.message : err}`);
+            }
+          });
+        }
         const updated = computeSummary(state);
         meter.value = updated.completed;
         percentLabel.textContent = formatPercent(updated.percent);
@@ -402,6 +436,38 @@
         nextButton.textContent = 'Fertig';
       }
       return currentSummary;
+    }
+
+    function syncFromExternal(nextState) {
+      const normalized = normalizeState(nextState);
+      if (statesEqual(normalized, state)) return;
+      state = normalized;
+      const updated = computeSummary(state);
+      meter.value = updated.completed;
+      percentLabel.textContent = formatPercent(updated.percent);
+      progress.textContent = updated.label;
+      const statusData = describeStatus(updated.percent);
+      statusBadge.textContent = statusData.label;
+      statusBadge.dataset.tone = statusData.tone;
+      TASKS.forEach(task => {
+        const entry = taskMap.get(task.id);
+        if (!entry) return;
+        if (entry.checkbox) {
+          entry.checkbox.checked = isTaskDone(state, task.id);
+        }
+        if (entry.noteField) {
+          const notes = state.notes && typeof state.notes === 'object' ? state.notes : {};
+          entry.noteField.value = typeof notes[task.id] === 'string' ? notes[task.id] : '';
+        }
+      });
+      updateNextStep(state, updated);
+      if (typeof onStatus === 'function') {
+        onStatus('Release-Checkliste synchronisiert');
+      }
+    }
+
+    if (storage && typeof storage.subscribeRelease === 'function') {
+      storage.subscribeRelease(syncFromExternal);
     }
 
     updateNextStep(state, summary);
