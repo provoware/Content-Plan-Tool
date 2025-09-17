@@ -45,6 +45,29 @@
       <section id="calendar-section" class="module active" aria-label="Kalender">
         <div class="section-header">
           <h2>Kalender</h2>
+          <div class="section-actions" role="toolbar" aria-label="Schnellaktionen für den Kalender">
+            <div class="section-actions-group" role="group" aria-label="Zu relevanten Tagen springen">
+              <button type="button" id="quick-today" class="secondary small" title="Zum heutigen Tag springen">Heute</button>
+              <button type="button" id="quick-next-free" class="secondary small" title="Nächsten freien Tag öffnen">Freier Tag</button>
+              <button type="button" id="quick-open-export" class="secondary small" title="Liste aller freien Tage als TXT speichern">Freie Tage TXT</button>
+            </div>
+            <div class="section-actions-group" role="group" aria-label="Übersichten öffnen">
+              <label for="quick-month" class="sr-only">Monatsübersicht auswählen</label>
+              <select id="quick-month" class="quick-select" title="Monatsübersicht auswählen"></select>
+              <button type="button" id="quick-month-overview" class="secondary small" title="Monatsübersicht anzeigen">Monatsübersicht</button>
+              <button type="button" id="quick-year-overview" class="secondary small" title="Jahresübersicht anzeigen">Jahresübersicht</button>
+            </div>
+          </div>
+          <div class="section-hint" id="calendar-tip" role="note" aria-live="polite" tabindex="-1">
+            <div class="hint-icon" aria-hidden="true">💡</div>
+            <div class="hint-body">
+              <p class="hint-title">Schnellstart‑Tipp</p>
+              <p class="hint-text">Nutze die Schnellaktionen, um wichtige Ansichten sofort zu öffnen – oder drücke <kbd>T</kbd> für heute und <kbd>F</kbd> für den nächsten freien Tag.</p>
+              <div class="hint-actions">
+                <button type="button" class="link-btn" id="dismiss-calendar-tip">Tipp ausblenden</button>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="calendar-wrapper">
           <!-- Der Kalender selbst wird vom Skript in #calendar erzeugt -->
@@ -88,6 +111,55 @@
               <option value="22">137 %</option>
             </select>
           </div>
+          <div class="form-group preview-group">
+            <span class="form-label">Live-Vorschau</span>
+            <div id="theme-preview" class="theme-preview" role="group" aria-live="polite" aria-label="Design-Vorschau für Theme, Akzentfarbe und Textgröße">
+              <div class="preview-meta">
+                <span id="theme-preview-theme">Hell</span>
+                <span id="theme-preview-palette">Blau</span>
+              </div>
+              <div class="preview-card">
+                <div class="preview-header">
+                  <span class="preview-dot"></span>
+                  <span class="preview-dot"></span>
+                  <span class="preview-dot"></span>
+                </div>
+                <div class="preview-body">
+                  <p class="preview-copy">Gut lesbarer Beispieltext für Karteninhalte.</p>
+                  <div class="preview-buttons">
+                    <span class="preview-btn primary">Primär</span>
+                    <span class="preview-btn">Sekundär</span>
+                  </div>
+                  <div class="preview-pills">
+                    <span class="preview-pill">Tag 1</span>
+                    <span class="preview-pill">Tag 2</span>
+                    <span class="preview-pill accent">Frei</span>
+                  </div>
+                </div>
+              </div>
+              <div class="preview-footer">
+                <span class="preview-tag">Textgröße: <span id="theme-preview-font">16 px</span></span>
+              </div>
+            </div>
+            <small class="muted">So wirkt deine Auswahl direkt im Kalender. Änderungen an Theme, Akzentfarbe und Textgröße werden sofort übernommen.</small>
+          </div>
+          <div class="form-group storage-health-group">
+            <span class="form-label">Speicher &amp; Sicherheit</span>
+            <div id="storage-health" class="storage-health" role="status" aria-live="polite">
+              <span class="storage-health__light" aria-hidden="true"></span>
+              <span class="storage-health__text">Speicher initialisieren …</span>
+            </div>
+            <div class="storage-health__meta">
+              <span id="storage-driver">Treiber: unbekannt</span>
+              <span id="storage-hash">Letzter Hash: —</span>
+            </div>
+            <div class="storage-health__actions" role="group" aria-label="Speichersicherheit steuern">
+              <button type="button" id="storage-safe-mode" class="secondary small">Safe-Mode aktivieren</button>
+              <button type="button" id="storage-show-snapshots" class="secondary small">Snapshots anzeigen</button>
+            </div>
+            <div id="storage-snapshots" class="storage-snapshots" aria-live="polite" role="list"></div>
+            <small class="muted">Im Safe-Mode (Schreibschutz) werden keine Änderungen gespeichert. Über „Snapshots anzeigen“ prüfst du die letzten Sicherungen.</small>
+          </div>
           <div class="form-group">
             <button type="button" id="clear-data-btn" class="warn">Daten löschen</button>
           </div>
@@ -103,10 +175,15 @@
           <ul>
             <li>Navigiere mithilfe der Seitenleiste zu den einzelnen Bereichen: <strong>Kalender</strong>, <strong>Einstellungen</strong> und <strong>Hilfe</strong>.</li>
             <li>Im <strong>Kalender</strong> kannst du durch Klick auf einen Tag Details eingeben: Titel, zusätzliche Titel, Beschreibungen, Tags und To‑Dos. Änderungen werden automatisch gespeichert.</li>
+            <li>Die Schnellaktionen oberhalb des Kalenders springen zu heute, zum nächsten freien Tag oder öffnen Übersichten. Die Tastenkürzel <kbd>T</kbd> und <kbd>F</kbd> bieten denselben Komfort über die Tastatur.</li>
             <li>Unter <strong>Einstellungen</strong> kannst du das Jahr, die Darstellung (Theme), die Akzentfarbe und die Textgröße festlegen. Diese Einstellungen werden gespeichert.</li>
             <li>Nutze Tastenkürzel: <kbd>T</kbd> springt zu heute, <kbd>F</kbd> zum nächsten freien Tag, <kbd>S</kbd> speichert manuell, <kbd>Esc</kbd> schließt Dialoge, <kbd>Strg</kbd>/<kbd>Cmd</kbd>+<kbd>Z</kbd> macht rückgängig, <kbd>Strg</kbd>/<kbd>Cmd</kbd>+<kbd>Y</kbd> wiederholt.</li>
             <li>Über den Bereich <strong>Backup</strong> in der Seitenleiste kannst du deine Daten als JSON exportieren. Zusätzlich speichert das System automatisch alle fünf Minuten ein Backup ab.</li>
           </ul>
+          <div class="help-actions">
+            <button type="button" id="restore-calendar-tip" class="secondary small">Kalender‑Tipp anzeigen</button>
+            <p class="muted">Der Tipp erklärt Schnellaktionen und Tastenkürzel direkt im Kalender. Der Button aktiviert ihn erneut, falls er ausgeblendet wurde.</p>
+          </div>
           <p>Weitere Erläuterungen findest du in der beiliegenden Anleitung (ANLEITUNG.md).</p>
         </div>
       </section>
@@ -118,13 +195,14 @@
         <div class="debug-content">
           <p id="debug-storage">Speicher: —</p>
           <p id="debug-size">Zustandsgröße: —</p>
-          <div class="debug-actions">
-            <button id="run-selfcheck" type="button" class="secondary" title="Umgebung prüfen und reparieren">Self‑Check &amp; Reparieren</button>
-            <button id="export-log" type="button" class="secondary" title="Protokoll als Datei speichern">Log exportieren</button>
-            <button id="clear-storage-btn" type="button" class="warn" title="Alle gespeicherten Daten löschen">Speicher zurücksetzen</button>
-            <button id="autosave-toggle" type="button" class="secondary" title="Automatisches Speichern umschalten">Autosave deaktivieren</button>
-            <button id="undo-btn" type="button" class="secondary" title="Letzte Aktion rückgängig machen (Strg/Cmd+Z)" disabled aria-disabled="true">↶ Undo</button>
-            <button id="redo-btn" type="button" class="secondary" title="Rückgängig gemachte Aktion wiederholen (Strg/Cmd+Y)" disabled aria-disabled="true">↷ Redo</button>
+        <div class="debug-actions">
+          <button id="run-selfcheck" type="button" class="secondary" title="Umgebung prüfen und reparieren">Self‑Check &amp; Reparieren</button>
+          <button id="check-cards-btn" type="button" class="secondary" title="Kalenderkarten auf Zugänglichkeit prüfen">Karten‑Check</button>
+          <button id="export-log" type="button" class="secondary" title="Protokoll als Datei speichern">Log exportieren</button>
+          <button id="clear-storage-btn" type="button" class="warn" title="Alle gespeicherten Daten löschen">Speicher zurücksetzen</button>
+          <button id="autosave-toggle" type="button" class="secondary" title="Automatisches Speichern umschalten">Autosave deaktivieren</button>
+          <button id="undo-btn" type="button" class="secondary" title="Letzte Aktion rückgängig machen (Strg/Cmd+Z)" disabled aria-disabled="true">↶ Undo</button>
+          <button id="redo-btn" type="button" class="secondary" title="Rückgängig gemachte Aktion wiederholen (Strg/Cmd+Y)" disabled aria-disabled="true">↷ Redo</button>
           </div>
           <div id="debug-results" class="list"></div>
         </div>
@@ -191,12 +269,16 @@
       <div class="modal-content" id="modal-content"></div>
     </div>
   </section>
+  <script src="js/helper-util.js" onerror="this.src='helper-util.js'"></script>
   <script src="js/history.js" onerror="this.src='history.js'"></script>
   <script src="js/colors.js" onerror="this.src='colors.js'"></script>
   <script src="js/time.js" onerror="this.src='time.js'"></script>
   <script src="js/theme-util.js" onerror="this.src='theme-util.js'"></script>
   <script src="js/fullscreen-util.js" onerror="this.src='fullscreen-util.js'"></script>
   <script src="js/clipboard-util.js" onerror="this.src='clipboard-util.js'"></script>
+  <script src="js/storage-manager.js" onerror="this.src='storage-manager.js'"></script>
+  <script src="js/quick-actions.js" onerror="this.src='quick-actions.js'"></script>
+  <script src="js/release-checklist.js" onerror="this.src='release-checklist.js'"></script>
   <script src="js/app.js" onerror="this.src='app.js'"></script>
 </body>
 </html>

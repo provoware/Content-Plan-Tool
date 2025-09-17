@@ -7,7 +7,7 @@ Dieses Dokument erläutert die Verwendung des **Jahrescontent‑Kalenders** Schr
 Die Oberfläche ist in drei Spalten unterteilt:
 
 1. **Navigationsleiste (links)** – Über die Schaltflächen gelangst du zu den Bereichen **Kalender**, **Einstellungen** und **Hilfe**. Unten findest du Buttons für **Backup** (JSON‑Export) und **Abmelden** (Daten zurücksetzen).
-   Zusätzlich gibt es einen Bereich **Debug**. In diesem Diagnosebereich kannst du den Zustand überprüfen (Self‑Check), das Ereignislog exportieren, den Speicher zurücksetzen und das automatische Backup ein‑ oder ausschalten. Die großen Schaltflächen besitzen erklärende Hinweise, die beim Überfahren erscheinen (Tooltips).
+   Zusätzlich gibt es einen Bereich **Debug**. In diesem Diagnosebereich kannst du den Zustand überprüfen (Self‑Check), das Ereignislog exportieren, den Speicher zurücksetzen und das automatische Backup ein‑ oder ausschalten. Ein neuer Button „Karten‑Check“ prüft die Monatskarten auf Zugänglichkeit (Rollen, Beschriftungen, Tastaturfokus) und zeigt das Ergebnis im Protokoll an. Die großen Schaltflächen besitzen erklärende Hinweise, die beim Überfahren erscheinen (Tooltips).
 2. **Arbeitsbereich (Mitte)** – Hier wird je nach Auswahl der entsprechende Inhalt angezeigt. Standardmäßig ist der Kalender aktiv.
 3. **Info‑Panel (rechts)** – Dieses Panel zeigt das Dashboard mit Statistiken zum aktuellen Monat, eine Liste offener Tage, anstehende To‑Dos, deine persönlichen Notizen, das Ereignislog und eine kleine Tippsektion.
 
@@ -29,7 +29,7 @@ Auf allen Seiten erscheint beim ersten Drücken der <kbd>Tab</kbd>-Taste ein ver
 3. **Speichern:** Änderungen werden automatisch beim Verlassen des Eingabefeldes oder Schließen des Drawers gespeichert. Du kannst zusätzlich mit <kbd>S</kbd> eine manuelle Speicherung auslösen.
 4. **Markierungen:** Freie Tage sind rot hinterlegt, belegte Tage grün. Heute wird mit einem gelben Rahmen markiert. Der Zähler in der Ecke zeigt offene/erledigte To‑Dos.
 5. **Monate maximieren:** Über „Max“ vergrößerst du einen Monat. In der Profiversion wird der ausgewählte Monat allein angezeigt und belegt die gesamte Breite der Kalenderansicht; alle anderen Monate werden ausgeblendet, sodass du dich auf diesen Abschnitt konzentrieren kannst. Ein weiterer Klick auf „Max“ stellt die normale Ansicht wieder her. „Vollbild“ schaltet den Monat in einen eigenen Vollbildmodus; mit erneutem Klick, der Taste <kbd>Esc</kbd> oder dem Tastenkürzel <kbd>Strg</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> verlässt du ihn. Unterstützt dein Browser die Vollbild‑Technik nicht, simuliert die Anwendung den Modus als Fallback und meldet dies in der Statuszeile.
-6. **Übersichten:** „Info“ öffnet eine tabellarische Monatsübersicht. Im Kopfbereich des Kalenders findest du Buttons für Jahres‑ und Monatsübersichten, PDF‑Druck und Text‑Export.
+6. **Schnellaktionen & Übersichten:** Oberhalb des Kalenders findest du die Schnellaktionen „Heute“, „Freier Tag“, „Monatsübersicht“, „Jahresübersicht“ sowie den TXT‑Export für freie Tage. Der Hinweisblock darunter erklärt zusätzlich die Tastenkürzel <kbd>T</kbd> (Heute) und <kbd>F</kbd> (Freier Tag); du kannst ihn über „Tipp ausblenden“ schließen. In der Hilfe steht ein Button „Kalender‑Tipp anzeigen“, der den Hinweis erneut aktiviert. Die Schaltflächen „Info“, „PDF“ oder „TXT“ in den Monatsköpfen öffnen weiterhin tabellarische Übersichten und Exporte.
 
 ## 3 – Dashboard nutzen
 
@@ -42,6 +42,7 @@ Das Dashboard im rechten Panel bietet folgende Informationen und Funktionen:
 * **Nächste To‑Dos:** Zeigt die kommenden offenen Aufgaben aus dem gesamten Jahr. Ein Klick öffnet den entsprechenden Tag.
 * **Notizen:** Ein freies Textfeld für deine eigenen Gedanken. Die Notizen werden beim Verlassen des Feldes gespeichert und bleiben browserseitig erhalten.
 * **Letzte Ereignisse:** Protokolliert Aktionen wie Änderungen, Exporte oder Backups. Das Log lässt sich leeren. Über „Duplikate prüfen“ kannst du nach doppelt verwendeten Titeln suchen; das Ergebnis wird als Textdatei exportiert.
+* **Release-Vorbereitung:** Eine farbig hervorgehobene Karte mit Fortschrittsbalken und Status-Badge begleitet dich durch die finale Qualitätsprüfung. Hake Dokumentation, Cross-Browser-Test und Feedbackrunde einzeln ab; die Hinweise liefern Tipps und Links zur Anleitung. Oberhalb der Liste zeigt ein Bereich „Nächster Schritt“ an, welche Aufgabe noch offen ist, erklärt sie in einem Satz und bietet mit „Jetzt starten“ einen Direkt-Sprung zum passenden Checklistenpunkt – so verlieren auch Einsteiger nicht den roten Faden. Unter jeder Aufgabe findest du ein Notizfeld, in dem du getestete Browser, Rückmeldungen oder Doku-Änderungen dokumentierst. Der Fortschritt und deine Notizen werden gespeichert und bei jedem Öffnen erneut angezeigt.
 * **Tipps:** Zusammenfassung der wichtigsten Tastenkürzel und Hinweise zur Bedienung.
 
 ## 4 – Einstellungen anpassen
@@ -54,9 +55,11 @@ Im Bereich **Einstellungen** stehen dir folgende Optionen zur Verfügung:
 | Theme           | Drei Farbschemata: Hell, Dunkel und Kontrast. Beim ersten Start richtet sich die Auswahl nach deinem System (hell oder dunkel). |
 | Akzentfarbe     | Blau, Grün, Violett oder Rot. Beeinflusst Highlights. |
 | Textgröße       | Vier Skalierungen von 100 % bis 137 %.                 |
+| Live‑Vorschau   | Zeigt ein Kartenbeispiel mit Buttons, Pillen und Textgröße, damit du Theme, Akzentfarbe und Schriftwirkung sofort beurteilen kannst. |
+| Speicher &amp; Sicherheit | Zeigt den aktiven Speicher (IndexedDB oder Fallback), den letzten Hash sowie die jüngsten Snapshots an. Der Button „Safe-Mode aktivieren“ schaltet einen Schreibschutz für alle Speicheraktionen. |
 | Daten löschen   | Setzt alle Einträge und Einstellungen zurück.         |
 
-Die Einstellungen werden sofort angewandt und gespeichert. Sollte dein Browser keinen Zugriff auf `localStorage` erlauben (z. B. im privaten Modus), greift ein In‑Memory‑Fallback; die Daten gehen dann jedoch beim Schließen des Fensters verloren.
+Die Einstellungen werden sofort angewandt und gespeichert. Sollte dein Browser keinen Zugriff auf `localStorage` erlauben (z. B. im privaten Modus), greift ein In‑Memory‑Fallback; die Daten gehen dann jedoch beim Schließen des Fensters verloren. Der Abschnitt **Speicher &amp; Sicherheit** informiert dich zusätzlich, ob die IndexedDB korrekt läuft. Dort kannst du auch den Safe-Mode aktivieren: Er sperrt sämtliche Speicheraktionen (praktisch für Sicherheitsaudits). Nach dem Deaktivieren kehrt das Tool zum vorherigen Autosave-Status zurück.
 
 ## 5 – Tastenkürzel
 
@@ -94,6 +97,8 @@ Die Anwendung überprüft beim Laden automatisch den Zustand der gespeicherten D
 * **Responsive Design:** Auf kleineren Bildschirmen fährt die Navigationsleiste ein; das Info‑Panel wird ausgeblendet, um Platz zu sparen.
 * **Klar beschriftete Bereiche:** Jede Sektion verfügt über eine Überschrift, und Formulare sind mit Labels versehen. Tooltips erklären Funktionen.
 * **Reduzierte Bewegung:** Wenn dein System „Weniger Bewegung“ vorgibt, werden Animationen und Übergänge abgeschaltet.
+* **Kalender per Tastatur:** Jede Tageskachel lässt sich nun direkt fokussieren; mit <kbd>Enter</kbd> oder <kbd>Leertaste</kbd> öffnest du den Editor auch ohne Maus.
+* **A11y‑Check:** Der Debug‑Button „Karten‑Check“ meldet, ob Monatskarten und Tageskacheln mit Rollen, Labels und Fokus erreichbar sind.
 
 Wir wünschen dir viel Erfolg bei der Planung deiner Inhalte mit dem Jahrescontent‑Kalender!
 

@@ -13,9 +13,16 @@
 (function() {
   'use strict';
   /* Hilfsfunktionen */
-  const $ = (sel, ctx=document) => ctx.querySelector(sel);
-  const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
-  const byId = id => document.getElementById(id);
+  const helperSource = (typeof globalThis !== 'undefined' && globalThis.HelperUtil) || {};
+  const $ = helperSource.$ || ((sel, ctx = document) => (ctx || document).querySelector(sel));
+  const $$ = helperSource.$$ || ((sel, ctx = document) => Array.from((ctx || document).querySelectorAll(sel)));
+  const byId = helperSource.byId || (id => (typeof document !== 'undefined' ? document.getElementById(id) : null));
+  const quickActionHelper = (typeof globalThis !== 'undefined' && globalThis.QuickActionHelper) || {};
+  const releaseChecklistModule = (typeof globalThis !== 'undefined' && globalThis.ReleaseChecklist) || {};
+  const storageManagerModule = (typeof globalThis !== 'undefined' && globalThis.StorageManager) || null;
+  const storageManager = storageManagerModule && typeof storageManagerModule.create === 'function'
+    ? storageManagerModule.create({ helper: helperSource })
+    : null;
   const fmt2 = n => String(n).padStart(2, '0');
   const today = new Date();
   const MONTHS = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
@@ -24,6 +31,7 @@
   const THEME_KEY = 'provoware_theme';
   const FS_KEY = 'provoware_fs';
   const PALETTE_KEY = 'provoware_palette';
+  const TIP_KEY = 'provoware_tip_calendar';
   const TIMEFMT_KEY = 'provoware_timefmt';
 
   /* Farben für Monatsrahmen und Überschriften. Diese Liste wird
@@ -51,30 +59,64 @@
   let autosaveEnabled = true;
   // ID des Autosave‑Intervalls (wird bei Aktivierung gesetzt)
   let autosaveInterval = null;
+  let storageSafeMode = false;
+  let autosaveBeforeSafeMode = true;
 
-  /* Speicher‑Wrapper mit Fallback */
-  const memStore = {};
-  function safeGet(key) {
+  /* Speicher‑Wrapper mit Fallback (zentralisiert in helper-util) */
+  const rawSafeGet = helperSource.safeGet || (key => {
     try {
-      return localStorage.getItem(key);
+      return typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null;
     } catch (err) {
-      return memStore[key] || null;
+      return null;
     }
-  }
-  function safeSet(key, value) {
+  });
+  const rawSafeSet = helperSource.safeSet || ((key, value, options = {}) => {
+    if (typeof localStorage === 'undefined') {
+      if (options.onFallback) options.onFallback(new Error('localStorage unavailable'));
+      return false;
+    }
     try {
       localStorage.setItem(key, value);
+      return true;
     } catch (err) {
-      memStore[key] = value;
-      updateStatus('Speichern im lokalen Speicher fehlgeschlagen, Fallback genutzt');
-      console.warn('localStorage set failed', err);
+      if (options.onFallback) options.onFallback(err);
+      return false;
     }
-  }
-  function safeRemove(key) {
+  });
+  const rawSafeRemove = helperSource.safeRemove || (key => {
+    if (typeof localStorage === 'undefined') return false;
     try {
       localStorage.removeItem(key);
+      return true;
     } catch (err) {
-      delete memStore[key];
+      return false;
+    }
+  });
+
+  function safeGet(key) {
+    return rawSafeGet(key);
+  }
+
+  function safeSet(key, value) {
+    if (storageSafeMode) {
+      updateStatus('Safe-Mode aktiv – Speichern übersprungen');
+      return false;
+    }
+    return rawSafeSet(key, value, { onFallback: storageFallback });
+  }
+
+  function safeRemove(key) {
+    if (storageSafeMode) {
+      updateStatus('Safe-Mode aktiv – Änderungen gesperrt');
+      return false;
+    }
+    return rawSafeRemove(key);
+  }
+
+  function storageFallback(err) {
+    updateStatus('Speichern im lokalen Speicher fehlgeschlagen, Fallback genutzt');
+    if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+      console.warn('localStorage set failed', err);
     }
   }
 
@@ -130,6 +172,10 @@
     }
   }
   function persistState() {
+    if (storageSafeMode) {
+      updateStatus('Safe-Mode aktiv – Speichern übersprungen');
+      return;
+    }
     history.push(previousState);
     previousState = JSON.stringify(state);
     try {
@@ -277,11 +323,13 @@
     document.documentElement.setAttribute('data-theme', val);
     state.theme = val;
     safeSet(THEME_KEY, val);
+    refreshThemePreview();
   }
   function applyFontSize(px) {
     document.documentElement.style.setProperty('--fs-base', `${px}px`);
     state.fontsize = px;
     safeSet(FS_KEY, px);
+    refreshThemePreview();
   }
   const PALETTES = {
     blue: { primary: '#1d4ed8', accent: '#0ea5e9' },
@@ -289,21 +337,97 @@
     violet:{ primary: '#7c3aed', accent: '#a78bfa' },
     red:  { primary: '#dc2626', accent: '#ef4444' }
   };
+  const THEME_LABELS = { hell: 'Hell', dunkel: 'Dunkel', kontrast: 'Kontrast' };
+  const PALETTE_LABELS = { blue: 'Blau', green: 'Grün', violet: 'Violett', red: 'Rot' };
   function applyPalette(name) {
     const pal = PALETTES[name] || PALETTES.blue;
     const rootStyle = document.documentElement.style;
     rootStyle.setProperty('--primary', pal.primary);
     rootStyle.setProperty('--accent', pal.accent);
+    if (typeof hexToRgba === 'function') {
+      rootStyle.setProperty('--accent-soft', hexToRgba(pal.accent, 0.18));
+    }
     // Berechne automatisierte Textfarbe auf Buttons anhand Luminanz
     const lum = luminance(...Object.values(hexToRgb(pal.primary)));
     rootStyle.setProperty('--btn-on-primary', lum > 0.6 ? '#000000' : '#ffffff');
     state.palette = name;
     safeSet(PALETTE_KEY, name);
+    refreshThemePreview();
   }
   function luminance(r,g,b) {
     r/=255; g/=255; b/=255;
     const a=[r,g,b].map(v => v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4));
     return 0.2126*a[0] + 0.7152*a[1] + 0.0722*a[2];
+  }
+
+  function refreshThemePreview() {
+    const themeEl = byId('theme-preview-theme');
+    if (themeEl) themeEl.textContent = THEME_LABELS[state.theme] || state.theme || '—';
+    const paletteEl = byId('theme-preview-palette');
+    if (paletteEl) paletteEl.textContent = PALETTE_LABELS[state.palette] || state.palette || '—';
+    const fontEl = byId('theme-preview-font');
+    if (fontEl) fontEl.textContent = `${state.fontsize || '16'} px`;
+  }
+
+  function syncQuickMonthSelector() {
+    const defaultMonth = (state.year === today.getFullYear()) ? today.getMonth() : 0;
+    if (quickActionHelper && typeof quickActionHelper.syncMonthSelector === 'function') {
+      quickActionHelper.syncMonthSelector({
+        helper: helperSource,
+        months: MONTHS,
+        defaultMonth
+      });
+      return;
+    }
+    const quickSel = byId('quick-month');
+    if (!quickSel) return;
+    if (!quickSel.children.length) {
+      quickSel.innerHTML = MONTHS.map((name, idx) => `<option value="${idx}">${fmt2(idx+1)} – ${name}</option>`).join('');
+    }
+    quickSel.value = String(defaultMonth);
+  }
+
+  function initCalendarTip() {
+    const tip = byId('calendar-tip');
+    if (!tip) return;
+    const dismissBtn = byId('dismiss-calendar-tip');
+    const restoreBtn = byId('restore-calendar-tip');
+    const wasHidden = safeGet(TIP_KEY) === 'hidden';
+    tip.hidden = wasHidden;
+    if (restoreBtn) {
+      restoreBtn.disabled = !wasHidden;
+      restoreBtn.setAttribute('aria-pressed', wasHidden ? 'false' : 'true');
+    }
+    if (dismissBtn) {
+      dismissBtn.addEventListener('click', () => {
+        tip.hidden = true;
+        safeSet(TIP_KEY, 'hidden');
+        if (restoreBtn) {
+          restoreBtn.disabled = false;
+          restoreBtn.setAttribute('aria-pressed', 'false');
+          restoreBtn.focus();
+        }
+        updateStatus('Kalender-Tipp ausgeblendet');
+      });
+    }
+    if (restoreBtn) {
+      restoreBtn.addEventListener('click', () => {
+        tip.hidden = false;
+        tip.classList.add('hint-pop');
+        safeRemove(TIP_KEY);
+        restoreBtn.disabled = true;
+        restoreBtn.setAttribute('aria-pressed', 'true');
+        setTimeout(() => tip.classList.remove('hint-pop'), 500);
+        requestAnimationFrame(() => {
+          try {
+            tip.focus({ preventScroll: true });
+          } catch (err) {
+            tip.focus();
+          }
+        });
+        updateStatus('Kalender-Tipp eingeblendet');
+      });
+    }
   }
 
   /* Initialisierung der UI */
@@ -370,6 +494,61 @@
         }
       });
     }
+    // Quick actions im Kalender
+    const defaultQuickMonth = (state.year === today.getFullYear()) ? today.getMonth() : 0;
+    if (quickActionHelper && typeof quickActionHelper.initQuickActions === 'function') {
+      quickActionHelper.initQuickActions({
+        helper: helperSource,
+        focusToday,
+        jumpNextFree,
+        exportOpenDaysTXT,
+        openOverview,
+        updateStatus,
+        months: MONTHS,
+        getYear: () => state.year,
+        defaultMonth: defaultQuickMonth
+      });
+    } else {
+      syncQuickMonthSelector();
+      const quickTodayBtn = byId('quick-today');
+      if (quickTodayBtn) {
+        quickTodayBtn.addEventListener('click', () => {
+          focusToday();
+        });
+      }
+      const quickFreeBtn = byId('quick-next-free');
+      if (quickFreeBtn) {
+        quickFreeBtn.addEventListener('click', () => {
+          jumpNextFree();
+        });
+      }
+      const quickExportBtn = byId('quick-open-export');
+      if (quickExportBtn) {
+        quickExportBtn.addEventListener('click', () => {
+          exportOpenDaysTXT();
+          updateStatus('TXT mit freien Tagen gespeichert');
+        });
+      }
+      const quickMonthSel = byId('quick-month');
+      const quickMonthBtn = byId('quick-month-overview');
+      if (quickMonthBtn && quickMonthSel) {
+        quickMonthBtn.addEventListener('click', () => {
+          const idx = parseInt(quickMonthSel.value, 10);
+          if (!Number.isNaN(idx)) {
+            openOverview('month', idx);
+            updateStatus(`Monatsübersicht geöffnet: ${MONTHS[idx]} ${state.year}`);
+          }
+        });
+      }
+      const quickYearBtn = byId('quick-year-overview');
+      if (quickYearBtn) {
+        quickYearBtn.addEventListener('click', () => {
+          openOverview('year');
+          updateStatus(`Jahresübersicht geöffnet: ${state.year}`);
+        });
+      }
+    }
+    initCalendarTip();
     // Settings form: will be populated via buildSelectors() and applyTheme
 
     // Debugging‑initialisierung wird separat über initDebug() durchgeführt
@@ -423,6 +602,10 @@
           <button id="btn-scan-dupes" class="secondary small">Duplikate prüfen</button>
         </div>
       </div>
+      <div class="dash-section release-section">
+        <div class="dash-title">Release-Vorbereitung</div>
+        <div id="release-checklist" aria-live="polite"></div>
+      </div>
       <div class="dash-section">
         <div class="dash-title">Tipps</div>
         <ul class="muted" style="margin:0;padding-left:1rem;font-size:var(--fs-sm);">
@@ -432,6 +615,18 @@
         </ul>
       </div>
     `;
+    if (releaseChecklistModule && typeof releaseChecklistModule.init === 'function') {
+      releaseChecklistModule.init({
+        container: byId('release-checklist'),
+        helper: helperSource,
+        storage: storageManager,
+        onStatus: updateStatus,
+        onLog(message) {
+          logEvent(message);
+          renderLog();
+        }
+      });
+    }
     // Event handlers for dashboard buttons
     byId('btn-export-open')?.addEventListener('click', exportOpenDaysTXT);
     byId('btn-month-txt')?.addEventListener('click', exportCurrentMonthTXT);
@@ -522,17 +717,28 @@
       const monthEl = document.createElement('section');
       monthEl.className = 'month';
       monthEl.setAttribute('data-month', m);
+      monthEl.setAttribute('role', 'region');
+      monthEl.setAttribute('aria-label', `${MONTHS[m]} ${state.year}`);
+      const headerId = `month-${state.year}-${m}`;
+      monthEl.setAttribute('aria-labelledby', headerId);
       // Weisen Sie jedem Monat eine individuelle Akzentfarbe zu. Die
       // Akzentfarbe wird sowohl als Rahmenfarbe als auch als
       // Schatten verwendet, um die optische Nähe zum Layout
       // hervorzuheben. Zusätzlich erhält die Kopfzeile eine
       // halbtransparente Hintergrundfarbe.
       const mColor = MONTH_COLORS[m % MONTH_COLORS.length];
-      monthEl.style.borderColor = mColor;
-      monthEl.style.boxShadow = `0 0 0 2px ${mColor}`;
+      const accentShade = typeof hexToRgba === 'function' ? hexToRgba(mColor, 0.45) : mColor;
+      monthEl.style.borderColor = accentShade;
+      if (typeof hexToRgba === 'function') {
+        monthEl.style.boxShadow = `0 28px 70px -35px ${hexToRgba(mColor, 0.55)}`;
+      } else {
+        monthEl.style.boxShadow = 'var(--shadow-md)';
+      }
+      monthEl.style.setProperty('--month-accent', mColor);
       // Header
       const header = document.createElement('div');
       header.className = 'month-header';
+      header.setAttribute('id', headerId);
       header.innerHTML = `
         <div class="month-name">${MONTHS[m]} ${state.year}</div>
         <div class="month-stats" id="stats-${m}">—</div>
@@ -543,7 +749,9 @@
         </div>
       `;
       // Kopfzeile mit transparenter Akzentfarbe hinterlegen
-      header.style.background = hexToRgba(mColor, 0.15);
+      header.style.background = typeof hexToRgba === 'function'
+        ? `linear-gradient(135deg, ${hexToRgba(mColor, 0.18)}, transparent)`
+        : '';
       // Grid
       const grid = document.createElement('div');
       grid.className = 'grid';
@@ -567,8 +775,18 @@
         const used = isUsed(item);
         const isToday = (state.year === today.getFullYear() && m === today.getMonth() && d === today.getDate());
         const day = document.createElement('div');
+        const todos = (item?.todos || []);
+        const openTodos = todos.filter(t => !t.done).length;
+        const doneTodos = todos.filter(t => t.done).length;
         day.className = 'day ' + (used ? 'used' : 'free') + (isToday ? ' today' : '');
         day.setAttribute('data-ymd', ymd);
+        day.setAttribute('role', 'gridcell');
+        day.setAttribute('tabindex', '0');
+        const ariaBits = [`${d}. ${MONTHS[m]} ${state.year}`, used ? 'belegt' : 'frei'];
+        if (isToday) ariaBits.push('Heute');
+        if (openTodos) ariaBits.push(`${openTodos} offene To-dos`);
+        if (doneTodos && !openTodos) ariaBits.push('alle To-dos erledigt');
+        day.setAttribute('aria-label', ariaBits.join(' · '));
         // Kopfzeile
         const headerEl = document.createElement('div');
         headerEl.className = 'day-header';
@@ -585,9 +803,6 @@
           stateEl.appendChild(b);
         }
         // To‑Do Badge
-        const todos = (item?.todos || []);
-        const openTodos = todos.filter(t => !t.done).length;
-        const doneTodos = todos.filter(t => t.done).length;
         if (openTodos || doneTodos) {
           const b = document.createElement('span');
           b.className = 'badge todos';
@@ -647,6 +862,13 @@
           // Nicht öffnen, wenn im Eingabefeld geklickt
           if (ev.target instanceof HTMLInputElement || ev.target instanceof HTMLTextAreaElement) return;
           openDrawer(ymd);
+        });
+        day.addEventListener('keydown', ev => {
+          if (ev.key === 'Enter' || ev.key === ' ') {
+            if (ev.target instanceof HTMLInputElement || ev.target instanceof HTMLTextAreaElement) return;
+            ev.preventDefault();
+            openDrawer(ymd);
+          }
         });
         // Inline Titel bearbeiten
         ti.addEventListener('input', e => {
@@ -1291,6 +1513,17 @@
     if (stEl) stEl.textContent = `Speicher: ${storageStatus}`;
     const szEl = byId('debug-size');
     if (szEl) szEl.textContent = `Zustandsgröße: ${sizeKB.toFixed(1)} KB`;
+    const driverEl = byId('storage-driver');
+    if (driverEl) {
+      const driver = storageManager ? storageManager.getDriver() : storageStatus;
+      const label = driver === 'indexeddb' ? 'IndexedDB' : driver === 'memory' ? 'Fallback' : storageStatus;
+      driverEl.textContent = `Treiber: ${label}`;
+    }
+    const hashEl = byId('storage-hash');
+    if (hashEl) {
+      const hash = storageManager && storageManager.getLastHash();
+      hashEl.textContent = `Letzter Hash: ${hash || '—'}`;
+    }
   }
 
   /* Zeigt Debug‑Ergebnisse an */
@@ -1300,15 +1533,62 @@
     box.innerHTML = '';
     if (!list || list.length === 0) {
       const p = document.createElement('div');
+      p.className = 'debug-entry ok';
       p.textContent = 'Keine Probleme gefunden.';
       box.appendChild(p);
       return;
     }
     list.forEach(l => {
       const div = document.createElement('div');
+      const cls = /in Ordnung|fertig/i.test(l) ? 'ok' : 'warn';
+      div.className = `debug-entry ${cls}`;
       div.textContent = l;
       box.appendChild(div);
     });
+  }
+
+  function checkCalendarAccessibility() {
+    const results = [];
+    const months = $$('.month');
+    if (!months.length) {
+      results.push('Kalender noch nicht gerendert – bitte Kalenderbereich öffnen.');
+      return results;
+    }
+    const missingRole = months.filter(m => m.getAttribute('role') !== 'region');
+    if (missingRole.length) {
+      results.push(`${missingRole.length} Monatskarten ohne Rolle „region“.`);
+    }
+    const missingLabel = months.filter(m => !m.getAttribute('aria-label') && !m.getAttribute('aria-labelledby'));
+    if (missingLabel.length) {
+      results.push(`${missingLabel.length} Monatskarten ohne zugängliche Beschriftung.`);
+    }
+    let missingFocus = 0;
+    let missingAria = 0;
+    let sampleFocus = '';
+    let sampleAria = '';
+    months.forEach(month => {
+      month.querySelectorAll('.day').forEach(day => {
+        if (!day.hasAttribute('tabindex')) {
+          missingFocus++;
+          if (!sampleFocus) sampleFocus = day.getAttribute('data-ymd') || 'unbekannt';
+        }
+        const ariaLabel = day.getAttribute('aria-label');
+        if (!ariaLabel || ariaLabel.trim().length < 5) {
+          missingAria++;
+          if (!sampleAria) sampleAria = day.getAttribute('data-ymd') || 'unbekannt';
+        }
+      });
+    });
+    if (missingFocus) {
+      results.push(`Tastatur: ${missingFocus} Tage ohne Fokus (erstes Beispiel ${sampleFocus}).`);
+    }
+    if (missingAria) {
+      results.push(`Beschriftung: ${missingAria} Tage ohne verständliches aria-label (erstes Beispiel ${sampleAria}).`);
+    }
+    if (!results.length) {
+      results.push('Kalenderkarten: Rollen, Beschriftungen und Tastaturzugriff sind in Ordnung.');
+    }
+    return results;
   }
 
   /* Autosave Steuerung */
@@ -1336,6 +1616,144 @@
     }
   }
 
+  function updateSafeModeButton() {
+    const btn = byId('storage-safe-mode');
+    if (!btn) return;
+    btn.textContent = storageSafeMode ? 'Safe-Mode deaktivieren' : 'Safe-Mode aktivieren';
+    btn.setAttribute('aria-pressed', storageSafeMode ? 'true' : 'false');
+  }
+
+  function setSafeMode(enabled) {
+    const next = Boolean(enabled);
+    if (storageSafeMode === next) {
+      updateSafeModeButton();
+      return;
+    }
+    storageSafeMode = next;
+    if (storageSafeMode) {
+      autosaveBeforeSafeMode = autosaveEnabled;
+      autosaveEnabled = false;
+      stopAutoSave();
+      updateStatus('Safe-Mode aktiv – Speichern pausiert');
+    } else {
+      autosaveEnabled = autosaveBeforeSafeMode;
+      if (autosaveEnabled) {
+        startAutoSave();
+      } else {
+        stopAutoSave();
+      }
+      updateStatus('Safe-Mode deaktiviert – Speichern wieder aktiv');
+    }
+    const body = document.body;
+    if (body && body.classList) {
+      body.classList.toggle('safe-mode', storageSafeMode);
+    }
+    updateSafeModeButton();
+  }
+
+  function initStorageMonitor() {
+    const panel = byId('storage-health');
+    if (!panel) return;
+    const textEl = panel.querySelector('.storage-health__text');
+    const driverEl = byId('storage-driver');
+    const hashEl = byId('storage-hash');
+    const snapshotsEl = byId('storage-snapshots');
+    const safeModeBtn = byId('storage-safe-mode');
+    const snapshotBtn = byId('storage-show-snapshots');
+
+    function setTone(tone, message) {
+      panel.dataset.tone = tone;
+      if (textEl) textEl.textContent = message;
+    }
+
+    function refreshSnapshots() {
+      if (!snapshotsEl) return;
+      if (!storageManager) {
+        snapshotsEl.innerHTML = '';
+        const entry = document.createElement('div');
+        entry.className = 'storage-snapshots__item';
+        entry.textContent = 'Snapshots stehen nur mit IndexedDB zur Verfügung.';
+        snapshotsEl.appendChild(entry);
+        return;
+      }
+      storageManager.getSnapshots(5).then(items => {
+        snapshotsEl.innerHTML = '';
+        if (!items || !items.length) {
+          const entry = document.createElement('div');
+          entry.className = 'storage-snapshots__item';
+          entry.textContent = 'Noch keine Snapshots gespeichert.';
+          snapshotsEl.appendChild(entry);
+          return;
+        }
+        items.forEach(item => {
+          const row = document.createElement('div');
+          row.className = 'storage-snapshots__item';
+          const time = document.createElement('span');
+          time.className = 'tag';
+          time.textContent = new Date(item.createdAt).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+          const hash = document.createElement('span');
+          hash.textContent = `Hash ${item.hash || '—'}`;
+          row.appendChild(time);
+          row.appendChild(hash);
+          snapshotsEl.appendChild(row);
+        });
+      });
+    }
+
+    if (!storageManager) {
+      setTone('warn', 'Fallbackspeicher aktiv – sichere regelmäßig externe Backups.');
+      if (driverEl) driverEl.textContent = 'Treiber: Fallback';
+      if (hashEl) hashEl.textContent = 'Letzter Hash: —';
+      if (snapshotBtn) {
+        snapshotBtn.disabled = true;
+        snapshotBtn.textContent = 'Snapshots nicht verfügbar';
+      }
+      refreshSnapshots();
+      updateSafeModeButton();
+      return;
+    }
+
+    storageManager.whenReady().then(info => {
+      const ok = info && info.driver === 'indexeddb';
+      setTone(ok ? 'ok' : 'warn', ok
+        ? 'IndexedDB aktiv – Snapshots laufen.'
+        : 'IndexedDB-Fallback aktiv – Daten werden temporär gesichert.');
+      if (driverEl) driverEl.textContent = `Treiber: ${ok ? 'IndexedDB' : 'Fallback'}`;
+      if (hashEl) {
+        const hash = storageManager.getLastHash();
+        hashEl.textContent = `Letzter Hash: ${hash || '—'}`;
+      }
+      refreshSnapshots();
+    });
+
+    storageManager.subscribeStatus(({ level, message }) => {
+      const tone = level === 'error' ? 'error' : level === 'warn' ? 'warn' : 'ok';
+      setTone(tone, message);
+    });
+
+    storageManager.subscribeRelease(() => {
+      if (hashEl) {
+        const hash = storageManager.getLastHash();
+        hashEl.textContent = `Letzter Hash: ${hash || '—'}`;
+      }
+      refreshSnapshots();
+    });
+
+    if (snapshotBtn) {
+      snapshotBtn.addEventListener('click', () => {
+        refreshSnapshots();
+        updateStatus('Snapshots aktualisiert');
+      });
+    }
+
+    if (safeModeBtn) {
+      updateSafeModeButton();
+      safeModeBtn.addEventListener('click', () => {
+        setSafeMode(!storageSafeMode);
+      });
+    }
+  }
+
   /* Debug‑Initialisierung */
   function initDebug() {
     // Render initial status
@@ -1351,6 +1769,16 @@
       renderLog();
       renderDebugStatus();
       showDebugResults(issues);
+    });
+    const cardsBtn = byId('check-cards-btn');
+    if (cardsBtn) cardsBtn.addEventListener('click', () => {
+      const report = checkCalendarAccessibility();
+      showDebugResults(report);
+      logEvent('Karten-Check ausgeführt');
+      renderLog();
+      updateStatus(report.length === 1 && /in Ordnung/.test(report[0])
+        ? 'Karten-Check: alles in Ordnung'
+        : 'Karten-Check abgeschlossen');
     });
     // Export log button
     const exportBtn = byId('export-log');
@@ -1412,7 +1840,9 @@
       updateDashboard();
       logEvent(`Jahr geändert: ${state.year}`);
       renderLog();
+      syncQuickMonthSelector();
     });
+    syncQuickMonthSelector();
     // Theme
     const themeSel = byId('theme');
     themeSel.value = normalizeTheme(state.theme);
@@ -1443,6 +1873,7 @@
       logEvent(`Akzentfarbe geändert: ${e.target.value}`);
       renderLog();
     });
+    refreshThemePreview();
   }
 
   /* Tastatur‑Shortcuts */
@@ -1494,25 +1925,51 @@
     }
   });
   function focusToday() {
-    const ymd = `${today.getFullYear()}-${fmt2(today.getMonth()+1)}-${fmt2(today.getDate())}`;
+    const currentYear = today.getFullYear();
+    if (state.year !== currentYear) {
+      const yearSel = byId('year');
+      if (yearSel) {
+        yearSel.value = String(currentYear);
+        yearSel.dispatchEvent(new Event('change', { bubbles: true }));
+      } else {
+        state.year = currentYear;
+        renderCalendar();
+        updateDashboard();
+        syncQuickMonthSelector();
+      }
+    }
+    const ymd = `${currentYear}-${fmt2(today.getMonth()+1)}-${fmt2(today.getDate())}`;
     const cell = document.querySelector(`.day[data-ymd="${ymd}"]`);
     if (cell) {
       cell.scrollIntoView({behavior:'smooth',block:'center'});
       cell.focus();
       openDrawer(ymd);
+      updateStatus('Heute geöffnet');
+      return true;
     }
+    updateStatus('Heute liegt außerhalb des aktuellen Plans');
+    return false;
   }
   function jumpNextFree() {
     const keys = Object.keys(allDays()).sort();
-    const firstFree = keys.find(k => !isUsed(state.items[k]));
-    if (firstFree) {
-      const cell = document.querySelector(`.day[data-ymd="${firstFree}"]`);
-      if (cell) {
-        cell.scrollIntoView({behavior:'smooth',block:'center'});
-        cell.focus();
-        openDrawer(firstFree);
-      }
+    const start = (state.year === today.getFullYear())
+      ? `${state.year}-${fmt2(today.getMonth()+1)}-${fmt2(today.getDate())}`
+      : `${state.year}-01-01`;
+    const firstFree = keys.find(k => k >= start && !isUsed(state.items[k]));
+    if (!firstFree) {
+      updateStatus('Keine freien Tage im aktuellen Jahr gefunden');
+      return false;
     }
+    const cell = document.querySelector(`.day[data-ymd="${firstFree}"]`);
+    if (cell) {
+      cell.scrollIntoView({behavior:'smooth',block:'center'});
+      cell.focus();
+      openDrawer(firstFree);
+      updateStatus(`Freier Tag geöffnet: ${firstFree.split('-').reverse().join('.')}`);
+      return true;
+    }
+    updateStatus('Freier Tag konnte nicht angezeigt werden');
+    return false;
   }
 
   /* Helfer HTML Escaping */
@@ -1565,6 +2022,7 @@
   setInterval(updateClock, 1000);
   renderLog();
   updateStatus('Bereit');
+  initStorageMonitor();
   // Debug initialisieren (enthält Autosave‑Start)
   initDebug();
   // Scroll zu aktuellem Monat bei Start
