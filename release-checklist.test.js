@@ -1,5 +1,5 @@
 /** @jest-environment jsdom */
-const { init, computeSummary, setTask } = require('./js/release-checklist');
+const { init, computeSummary, setTask, setNote } = require('./js/release-checklist');
 
 describe('ReleaseChecklist module', () => {
   test('computeSummary returns totals and label', () => {
@@ -18,6 +18,16 @@ describe('ReleaseChecklist module', () => {
     const cleared = setTask(next, 'docs', false);
     expect(cleared.docs).toBeUndefined();
     expect(cleared.browsers).toBe(true);
+  });
+
+  test('setNote stores trimmed note values immutably', () => {
+    const state = { docs: true, notes: { docs: 'Alt' } };
+    const next = setNote(state, 'docs', '  Neuer Hinweis  ');
+    expect(next).not.toBe(state);
+    expect(next.notes.docs).toBe('Neuer Hinweis');
+    expect(state.notes.docs).toBe('Alt');
+    const cleared = setNote(next, 'docs', '  ');
+    expect(cleared.notes).toBeUndefined();
   });
 
   test('init renders checklist, respects storage and persists changes', () => {
@@ -50,8 +60,41 @@ describe('ReleaseChecklist module', () => {
 
     const progressText = document.querySelector('.release-card__progress').textContent;
     expect(progressText).toMatch(/2 von 3/);
+    const badge = document.querySelector('.release-card__status');
+    expect(badge.textContent).toMatch(/Gut unterwegs|Fast geschafft|Bereit für Release|Noch Aufgaben offen/);
 
     checkboxes[1].click();
     expect(status.mock.calls.some(call => call[0].includes('reaktiviert'))).toBe(true);
+  });
+
+  test('init renders note fields and saves updates', () => {
+    document.body.innerHTML = '<div id="rc"></div>';
+    const helper = {
+      safeGet: jest.fn().mockReturnValue(JSON.stringify({
+        browsers: true,
+        notes: { browsers: 'Chrome/Firefox ✅' }
+      })),
+      safeSet: jest.fn()
+    };
+    const status = jest.fn();
+    const log = jest.fn();
+
+    init({
+      container: document.getElementById('rc'),
+      helper,
+      onStatus: status,
+      onLog: log
+    });
+
+    const noteField = document.getElementById('browsers-note');
+    expect(noteField).toBeTruthy();
+    expect(noteField.value).toBe('Chrome/Firefox ✅');
+    noteField.value = 'Chrome, Firefox, Edge';
+    noteField.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(helper.safeSet).toHaveBeenCalled();
+    const payload = JSON.parse(helper.safeSet.mock.calls.slice(-1)[0][1]);
+    expect(payload.notes.browsers).toBe('Chrome, Firefox, Edge');
+    expect(status.mock.calls.some(call => call[0].includes('Notiz gespeichert'))).toBe(true);
+    expect(log.mock.calls.some(call => call[0].includes('Notiz aktualisiert'))).toBe(true);
   });
 });

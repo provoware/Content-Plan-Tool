@@ -42,7 +42,7 @@ Das Dashboard im rechten Panel bietet folgende Informationen und Funktionen:
 * **Nächste To‑Dos:** Zeigt die kommenden offenen Aufgaben aus dem gesamten Jahr. Ein Klick öffnet den entsprechenden Tag.
 * **Notizen:** Ein freies Textfeld für deine eigenen Gedanken. Die Notizen werden beim Verlassen des Feldes gespeichert und bleiben browserseitig erhalten.
 * **Letzte Ereignisse:** Protokolliert Aktionen wie Änderungen, Exporte oder Backups. Das Log lässt sich leeren. Über „Duplikate prüfen“ kannst du nach doppelt verwendeten Titeln suchen; das Ergebnis wird als Textdatei exportiert.
-* **Release-Vorbereitung:** Eine farbig hervorgehobene Karte mit Fortschrittsbalken begleitet dich durch die finale Qualitätsprüfung. Hake Dokumentation, Cross-Browser-Test und Feedbackrunde einzeln ab; die Hinweise liefern Tipps und Links zur Anleitung. Der Fortschritt wird gespeichert und bei jedem Öffnen erneut angezeigt.
+* **Release-Vorbereitung:** Eine farbig hervorgehobene Karte mit Fortschrittsbalken und Status-Badge begleitet dich durch die finale Qualitätsprüfung. Hake Dokumentation, Cross-Browser-Test und Feedbackrunde einzeln ab; die Hinweise liefern Tipps und Links zur Anleitung. Unter jeder Aufgabe findest du ein Notizfeld, in dem du getestete Browser, Rückmeldungen oder Doku-Änderungen dokumentierst. Der Fortschritt und deine Notizen werden gespeichert und bei jedem Öffnen erneut angezeigt.
 * **Tipps:** Zusammenfassung der wichtigsten Tastenkürzel und Hinweise zur Bedienung.
 
 ## 4 – Einstellungen anpassen
